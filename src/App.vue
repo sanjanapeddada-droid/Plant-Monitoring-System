@@ -1,20 +1,24 @@
 <script setup>
-import HelloWorld from './components/HelloWorld.vue'
-import TheWelcome from './components/TheWelcome.vue'
+import Login from './views/Login.vue'
+import { ref } from 'vue'
+const showLogin = ref(false)
 </script>
 
 <template>
   <header>
-    <img alt="Vue logo" class="logo" src="./assets/logo.svg" width="125" height="125" />
-
-    <div class="wrapper">
-      <HelloWorld msg="You did it!" />
-    </div>
+    <div id="app">
+    <h1>Welcome to the Plant Monitoring System🌸</h1>
+    <router-view /> 
+  </div>
   </header>
 
-  <main>
-    <TheWelcome />
-  </main>
+  <div>
+    
+    <button :disabled="false" v-if="!showLogin" @click="showLogin = true">Login</button> 
+    
+    <Login v-if="showLogin" />
+    
+  </div>
 </template>
 
 <style scoped>
@@ -43,5 +47,17 @@ header {
     place-items: flex-start;
     flex-wrap: wrap;
   }
+
+  button {
+  padding: 0.75rem 1rem;
+  font-size: 1.1rem;
+  background-color: #0069d9;
+  color: #3f19d8;
+  border: none;
+  border-radius: 4px;
+}
+button:hover {
+  background-color: #d75a73;
+}
 }
 </style>
