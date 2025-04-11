@@ -5,59 +5,101 @@ const showLogin = ref(false)
 </script>
 
 <template>
-  <header>
-    <div id="app">
-    <h1>Welcome to the Plant Monitoring System🌸</h1>
-    <router-view /> 
+  <div class="sidebar">
+    
+    <div class="title">Plant Monitoring System</div>
+    
+   
+    <nav>
+      <ul class="menu">
+        <li>
+          <router-link to="/dashboard" class="menu-link">Dashboard</router-link>
+        </li>
+        <li>
+          <router-link to="/login" class="menu-link">Login</router-link>
+        </li>
+        <li>
+          <router-link to="/menu" class="menu-link">Menu</router-link>
+          
+          <ul class="submenu">
+            <li><router-link to="/menu/MyPlants" class="submenu-link">My plants</router-link></li>
+            <li><router-link to="/menu/ActiveSensors" class="submenu-link">Active sensors</router-link></li>
+          </ul>
+        </li>
+      </ul>
+    </nav>
   </div>
-  </header>
-
-  <div>
-    
-    <button :disabled="false" v-if="!showLogin" @click="showLogin = true">Login</button> 
-    
-    <Login v-if="showLogin" />
-    
+  
+  <!-- Main content area, shifted right to accommodate the sidebar -->
+  <div class="content">
+    <router-view />
   </div>
 </template>
 
+
 <style scoped>
-header {
-  line-height: 1.5;
+/* Sidebar container for the title and menu */
+.sidebar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 250px;               
+  height: 100vh;
+  background-color: #5db09e;
+  padding: 1rem;
+  box-shadow: 2px 0 5px rgba(0,0,0,0.1);
 }
 
-.logo {
-  display: block;
-  margin: 0 auto 2rem;
+
+.title {
+  font-size: 1.5rem;
+  font-weight: bold;
+  margin-bottom: 1rem;
+  text-align: left;
 }
 
-@media (min-width: 1024px) {
-  header {
-    display: flex;
-    place-items: center;
-    padding-right: calc(var(--section-gap) / 2);
-  }
 
-  .logo {
-    margin: 0 2rem 0 0;
-  }
-
-  header .wrapper {
-    display: flex;
-    place-items: flex-start;
-    flex-wrap: wrap;
-  }
-
-  button {
-  padding: 0.75rem 1rem;
-  font-size: 1.1rem;
-  background-color: #0069d9;
-  color: #3f19d8;
-  border: none;
-  border-radius: 4px;
+.menu {
+  list-style: none;
+  padding: 0;
+  margin: 0;
 }
-button:hover {
-  background-color: #d75a73;
+
+.menu li {
+  margin-bottom: 0.75rem;
 }
+
+
+.menu-link {
+  text-decoration: none;
+  color: #052c18;
+}
+
+
+.router-link-active {
+  font-weight: bold;
+  color: #7d67b6;
+}
+
+
+.submenu {
+  list-style: none;
+  padding-left: 1rem;  /* Indent nested items */
+  margin-top: 0.5rem;
+}
+
+.submenu-link {
+  text-decoration: none;
+  color: #173522;
+}
+
+
+.content {
+  margin-left: 260px;  /* This margin should be greater than the sidebar width */
+  padding: 1rem;
+}
+nav:hover {
+  background-color: #eaaab7;
 }
 </style>
+

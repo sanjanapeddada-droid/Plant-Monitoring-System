@@ -39,16 +39,15 @@
     max-width: 400px;
     margin: 3rem auto;
     padding: 2rem;
-    border: 1px solid #ddd;
+    border: 1px solid #84a882;
     border-radius: 8px;
-    background-color: #fafafa;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    background-color: #84a882;
   }
   
   h1 {
     text-align: center;
     margin-bottom: 1.5rem;
-    color: #333;
+    color: #d84363;
   }
   
   .form-group {
@@ -59,33 +58,18 @@
     display: block;
     margin-bottom: 0.5rem;
     font-weight: bold;
-    color: #555;
+    color: #955555;
   }
   
   input[type="text"],
   input[type="password"] {
     width: 100%;
     padding: 0.5rem;
-    border: 1px solid #ccc;
+    border: 1px solid #e8a4a4;
     border-radius: 4px;
     font-size: 1rem;
   }
   
-  button {
-    width: 100%;
-    padding: 0.75rem;
-    font-size: 1.1rem;
-    background-color: #0069d9;
-    color: #fff;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-    transition: background-color 0.2s ease;
-  }
-  
-  button:hover {
-    background-color: #0053ba;
-  }
   </style>
   ``
   
