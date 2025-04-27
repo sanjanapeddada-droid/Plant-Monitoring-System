@@ -13,9 +13,7 @@
   import { ref } from 'vue'
   
   const plants = ref([
-    { id: 1, name: 'Aloe Vera', moisture: '40%'},
-    { id: 2, name: 'Snake Plant', moisture: '35%'},
-    { id: 3, name: 'Ficus', moisture: '30%' }
+   
   ])
   </script>
   
