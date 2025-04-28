@@ -1,7 +1,7 @@
 
 #include <rpcWiFi.h>
 #include <PubSubClient.h>
-#include <wifi_config.h> //getting the wifi credentials
+#include "wifi_config.h" //getting the wifi credentials
 
 WiFiClient wifiClient;
 PubSubClient client(wifiClient);
