@@ -21,3 +21,8 @@ export const SubscribeToTemperatureTopic = (plantID) => {
     });
 });
 };
+
+client.on('message', (topic, message) => {
+    CompareTemperatureData(topic, message, plantID); // Call the handleMoistureData function
+  });
+  

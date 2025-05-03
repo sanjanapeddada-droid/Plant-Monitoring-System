@@ -1,6 +1,6 @@
 import { pool } from './db.js';
 
-client.on('message', async (topic, message) => {
+export const CompareTemperatureData = async (topic, message, selectedID) => {
     try {
       const SensorValue = parseFloat(message.toString());
   
@@ -41,4 +41,4 @@ client.on('message', async (topic, message) => {
     catch (error) {
         console.error('Error in recieving data.', error);
     }
-  });
+  };

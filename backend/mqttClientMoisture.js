@@ -2,6 +2,7 @@ import mqtt from 'mqtt';
 import dotenv from 'dotenv';
 dotenv.config(); 
 
+
 export const client = mqtt.connect(process.env.MQTT_BROKER);
 
 export const SubscribeToMoistureTopic = (plantID) => {
@@ -21,3 +22,4 @@ export const SubscribeToMoistureTopic = (plantID) => {
     });
 });
 };
+
