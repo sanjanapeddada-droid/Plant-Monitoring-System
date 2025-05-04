@@ -1,3 +1,6 @@
+
+wifi_config.h
+
 # Logs
 logs
 *.log
@@ -28,3 +31,4 @@ coverage
 *.sw?
 
 *.tsbuildinfo
+
