@@ -1,8 +1,10 @@
 <template>
   <div class="menu-container">
-    <!-- Optional: If you intend to use the .menu-page class, you can include content here or remove it if unnecessary -->
+    
     <div class="menu-page">
       <h1>Menu Page</h1>
+      <router-view />
+      
     </div>
   </div>
 </template>
