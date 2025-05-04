@@ -55,6 +55,6 @@ void loop() {
   sprintf(payload, "%d", moistureValue);
   client.publish(topic, payload);
 
-  delay(5000); // Send every 5 seconds
+  delay(1800000); // Send every 30 minutes
 
 }
