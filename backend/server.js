@@ -1,15 +1,27 @@
-import express from 'express';
-import cors from 'cors';
-import dotenv from 'dotenv';
-dotenv.config();
+import express from 'express'
+import cors    from 'cors'
+import dotenv  from 'dotenv'
+dotenv.config()
 
-import './mqttClient.js';       
-import plantRoutes from './routes/plants.js';
+import authRoutes  from './routes/auth.js'
+import plantRoutes from './routes/plants.js'
+import './mqttClient.js'
 
-const app = express();
-app.use(cors(), express.json());
-app.use('/api/plants', plantRoutes);
+const app = express()
+app.use(cors())
+app.use(express.json())
 
-app.listen(process.env.PORT, () =>
-  console.log(`API listening on port ${process.env.PORT}`)
-);
+
+app.use('/api/auth', authRoutes)
+
+
+app.use('/api/plants', plantRoutes)
+
+const PORT = process.env.PORT || 3000
+app.listen(PORT, () => console.log(`API listening on port ${PORT}`))
+
+
+
+
+
+
