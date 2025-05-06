@@ -7,6 +7,7 @@ WiFiClient wifiClient;
 PubSubClient client(wifiClient);
 
 int moisturePin = A0; 
+pinMode(WIO_LIGHT, INPUT);
 const char* topic = "wio/moisture"; 
 
 void setup() {
@@ -49,6 +50,10 @@ void loop() {
   client.loop(); 
   int moistureValue = analogRead(moisturePin);
   Serial.println(moistureValue);
+
+  int lightValue = analogRead(WIO_LIGHT);
+  Serial.println(lightValue);
+  
 
   char payload[10];                       // this line and the two under is from chatgpt. Explination: It takes a numeric sensor value (moistureValue), 
                                           // turns it into a string, and sends it to an MQTT topic so other devices or apps can read it.
