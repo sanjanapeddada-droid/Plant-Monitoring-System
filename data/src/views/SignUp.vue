@@ -40,9 +40,9 @@
       })
       router.push('/login')
     } catch (e) {
-      error.value = 'Could not create account'
-    }
-  }
+  console.error('Signup error:', e.response?.data || e.message || e)
+  error.value = e.response?.data?.message || 'Could not create account'
+}}
   </script>
   
   <style scoped>
