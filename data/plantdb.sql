@@ -22,7 +22,6 @@ SET time_zone = "+00:00";
 --
 
 -- --------------------------------------------------------
-
 --
 -- Table structure for table `plant_profiles`
 --
@@ -78,6 +77,7 @@ INSERT INTO `plant_profiles` (`id`, `name`, `min_percentage`, `max_percentage`, 
 --
 -- Table structure for table `plant_recommendations`
 --
+
 
 DROP TABLE IF EXISTS `plant_recommendations`;
 CREATE TABLE IF NOT EXISTS `plant_recommendations` (

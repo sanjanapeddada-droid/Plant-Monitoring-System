@@ -4,11 +4,11 @@
     <form @submit.prevent="handleLogin">
       <div class="form-group">
         <label>Username</label>
-        <input v-model="username" required/>
+        <input v-model="username" required />
       </div>
       <div class="form-group">
         <label>Password</label>
-        <input type="password" v-model="password" required/>
+        <input type="password" v-model="password" required />
       </div>
       <button type="submit">Log In</button>
       <p v-if="error" class="error">{{ error }}</p>
@@ -19,6 +19,8 @@
 <script setup>
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
+// Import the auth store
+import { auth } from '../stores/auth'
 import axios from 'axios'
 
 const username = ref('')
@@ -28,25 +30,56 @@ const router   = useRouter()
 
 async function handleLogin() {
   try {
+    // Sending login request to the backend API
     const res = await axios.post('/api/auth/login', {
       username: username.value,
-      password: password.value
+      password: password.value,
     })
-    localStorage.setItem('token',  res.data.token)
-    localStorage.setItem('user',   JSON.stringify(res.data.user))
+
+    // If login is successful, save the user data and token to the auth store and localStorage
+    auth.login(res.data.user, res.data.token)
+
+    // Redirect to the menu after successful login
     router.push('/menu/myplants')
-  } catch {
+  } catch (err) {
     error.value = 'Invalid credentials (have you signed up?)'
   }
 }
 </script>
 
 <style scoped>
-/* same styling as SignUp.vue */
-.auth-container { max-width: 400px; margin: auto; padding: 2rem; background: #f9f9f9; border-radius: 8px; }
-.form-group { margin-bottom: 1rem; }
-label { display: block; margin-bottom: .5rem; }
-input { width: 100%; padding: .5rem; }
-button { background: #00d950; color: white; padding: .75rem; width: 100%; border: none; }
-.error { color: #d84363; margin-top: .5rem; }
+.auth-container {
+  max-width: 400px;
+  margin: auto;
+  padding: 2rem;
+  background: #f9f9f9;
+  border-radius: 8px;
+}
+
+.form-group {
+  margin-bottom: 1rem;
+}
+
+label {
+  display: block;
+  margin-bottom: 0.5rem;
+}
+
+input {
+  width: 100%;
+  padding: 0.5rem;
+}
+
+button {
+  background: #00d950;
+  color: white;
+  padding: 0.75rem;
+  width: 100%;
+  border: none;
+}
+
+.error {
+  color: #d84363;
+  margin-top: 0.5rem;
+}
 </style>
