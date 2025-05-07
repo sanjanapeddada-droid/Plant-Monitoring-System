@@ -1,4 +1,3 @@
-
 #include <rpcWiFi.h>
 #include <PubSubClient.h>
 #include "wifi_config.h" //getting the wifi credentials
@@ -11,6 +10,7 @@ int waterPin = A6;
 const char* topic = "wio/moisture"; 
 
 void setup() {
+  pinMode(WIO_LIGHT, INPUT);
   Serial.begin(115200); 
   
   Serial.print("Connecting to ");
@@ -53,6 +53,9 @@ void loop() {
 
   int waterValue = analogRead(waterPin);
   Serial.println(waterValue);
+
+  int lightValue = analogRead(WIO_LIGHT);
+  Serial.println(lightValue);
   
   char payload[10];                       // this line and the two under is from chatgpt. Explination: It takes a numeric sensor value (moistureValue), 
                                           // turns it into a string, and sends it to an MQTT topic so other devices or apps can read it.
