@@ -37,4 +37,42 @@ router.post('/login', async (req, res) => {
   res.json({ token, user: { id: user.id, username: user.username, full_name: user.full_name } })
 })
 
+
+
+router.post('/login', async (req, res) => {
+  try {
+    const { username, password } = req.body;
+    const [rows] = await pool.query(
+      'SELECT * FROM users WHERE username = ?',
+      [username]
+    );
+
+    if (!rows.length) {
+      return res.status(401).json({ message: 'Invalid credentials' });
+    }
+
+    const user = rows[0];
+    const ok = await bcrypt.compare(password, user.password);
+
+    if (!ok) {
+      return res.status(401).json({ message: 'Invalid credentials' });
+    }
+
+    // now that JWT_SECRET is defined this won't blow up
+    const token = jwt.sign(
+      { id: user.id },
+      process.env.JWT_SECRET,
+      { expiresIn: '1h' }
+    );
+
+    res.json({
+      token,
+      user: { id: user.id, username: user.username, full_name: user.full_name },
+    });
+  } catch (err) {
+    console.error('Login error:', err);
+    res.status(500).json({ message: 'Server error during login' });
+  }
+});
+
 export default router
