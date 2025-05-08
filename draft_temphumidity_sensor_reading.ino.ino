@@ -13,9 +13,9 @@ const char* temperatureTopic = "wio/temperature";
 const char* humidityTopic = "wio/humidity";
 
 // wiFi and MQTT settings
-const char* ssid = "TP-Link_755C_5G";
-const char* password = "59822936";
-const char* mqtt_server = "192.168.0.105";
+const char* ssid = "";
+const char* password = "";
+const char* mqtt_server = "192.168";
 
 WiFiClient wifiClient;
 PubSubClient client(wifiClient);
