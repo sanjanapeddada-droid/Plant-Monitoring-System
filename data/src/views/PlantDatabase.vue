@@ -1,3 +1,5 @@
+
+
 <template>
     <div class="plant-database">
       <h2>Plant Database</h2>
@@ -10,12 +12,31 @@
   </template>
   
   <script setup>
-  import { ref } from 'vue'
+
+  import { ref, onMounted } from 'vue'
+  import axios from 'axios'
   
-  const plants = ref([
-   
-  ])
-  </script>
+  const plants = ref([])
+  const error  = ref(null)
+
+
+
+  onMounted(async () => {
+  try {
+    const res = await axios.get('/api/plant_profiles')
+    plants.value = res.data
+  } catch (e) {
+    console.error(e)
+    error.value = 'Could not load plant data'
+  }
+})
+</script>
+
+  
+
+
+
+
   
   <style scoped>
   .plant-database {
