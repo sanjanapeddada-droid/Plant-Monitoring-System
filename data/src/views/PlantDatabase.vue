@@ -49,29 +49,27 @@ const filteredPlants = computed(() => {
 
 // Function to add plant to user's personal list
 async function addPlant(plant) {
+  // ← Add your debug here
+  console.log('Adding plant, token=', auth.token)
+
   if (!auth.token) {
     alert('You are not logged in! Please log in first.')
     return
   }
 
   try {
-    // Send a request to add the plant to the user's list
     await axios.post(
       'http://localhost:3000/api/plants/add',
       { plant_id: plant.id },
-      {
-        headers: {
-          Authorization: `Bearer ${auth.token}`
-        }
-      }
+      { headers: { Authorization: `Bearer ${auth.token}` } }
     )
     alert(`${plant.name} has been added to your plants!`)
   } catch (err) {
     console.error('Error adding plant:', err)
     alert('Could not add plant. Are you logged in?')
   }
-}
-</script>
+}</script>
+
 
 <style scoped>
 .plant-database {
