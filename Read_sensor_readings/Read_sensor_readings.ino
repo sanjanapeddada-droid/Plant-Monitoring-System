@@ -1,12 +1,10 @@
-#include <DHT.h>
-#include <DHT_U.h>
-
 #include <rpcWiFi.h>
 #include <PubSubClient.h>
+#include <DHT.h>
 #include "wifi_config.h" //getting the wifi credentials
 
 // DHT sensor settings
-#define DHTPIN 0          // use D1 (Grove digital port)
+#define DHTPIN D2          // use D2 (Grove digital port)
 #define DHTTYPE DHT11       // sensor type: DHT11
 
 WiFiClient wifiClient;
@@ -27,7 +25,6 @@ void setup() {
 
   dht.begin();  
 
-  
   Serial.print("Connecting to ");
   Serial.println(ssid);
   WiFi.begin(ssid, password);
@@ -104,6 +101,7 @@ void loop() {
   //sprintf(payload, "%d", moistureValue);
   //client.publish(topic, payload);
 
-  delay(1800000); // Send every 30 minutes
+  delay(30000); // Send every 30 seconds
 
 }
+
