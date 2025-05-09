@@ -1,26 +1,67 @@
-import express from 'express';
-import { pool } from '../db.js';
-const router = express.Router();
+import express from 'express'
+import { pool } from '../db.js'
+import jwt from 'jsonwebtoken'
 
+const router = express.Router()
+
+// Middleware to verify JWT token
+function verifyToken(req, res, next) {
+  const token = req.headers['authorization']?.split(' ')[1]
+  if (!token) return res.status(403).json({ message: 'No token provided' })
+
+  jwt.verify(token, process.env.JWT_SECRET, (err, decoded) => {
+    if (err) return res.status(401).json({ message: 'Unauthorized' })
+    req.userId = decoded.id
+    next()
+  })
+}
+
+// Get all plant profiles (to display in the frontend)
 router.get('/profiles', async (req, res) => {
-  const [rows] = await pool.query('SELECT * FROM plant_profiles');
-  res.json(rows);
-});
+  try {
+    const [rows] = await pool.query('SELECT * FROM plant_profiles')
+    res.json(rows)
+  } catch (err) {
+    console.error('Error fetching plant profiles:', err)
+    res.status(500).json({ message: 'Error fetching plant profiles' })
+  }
+})
 
-
+// Get user-specific plants
 router.get('/user/:id', async (req, res) => {
-  const userId = req.params.id;
-  const [rows] = await pool.query(
-    `SELECT up.id AS userPlantId, p.name,
-            p.min_percentage, p.max_percentage,
-            p.light_requirement
-     FROM user_plants up
-     JOIN plant_profiles p
+  const userId = req.params.id
+  try {
+    const [rows] = await pool.query(
+      `SELECT up.id AS userPlantId, p.name, p.min_percentage, p.max_percentage, p.light_requirement
+       FROM user_plants up
+       JOIN plant_profiles p
        ON up.plant_type_id = p.id
-     WHERE up.user_id = ?`,
-    [userId]
-  );
-  res.json(rows);
-});
+       WHERE up.user_id = ?`,
+      [userId]
+    )
+    res.json(rows)
+  } catch (err) {
+    console.error('Error fetching user plants:', err)
+    res.status(500).json({ message: 'Error fetching user plants' })
+  }
+})
 
-export default router;
+// Add a plant to the user's personal list (requires authentication)
+router.post('/add', verifyToken, async (req, res) => {
+  const { plant_id } = req.body
+  const userId = req.userId // User ID from the token
+
+  try {
+    // Insert the plant into the user's personal plants list
+    const [result] = await pool.query(
+      'INSERT INTO user_plants (user_id, plant_type_id) VALUES (?, ?)',
+      [userId, plant_id]
+    )
+    res.status(201).json({ message: 'Plant added successfully' })
+  } catch (err) {
+    console.error('Error adding plant to user list:', err)
+    res.status(500).json({ message: 'Error adding plant to user list' })
+  }
+})
+
+export default router
