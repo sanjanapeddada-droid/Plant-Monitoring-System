@@ -27,6 +27,20 @@ const error    = ref(null)
 const router   = useRouter()
 
 async function handleLogin() {
+   error.value = null
+
+
+  if (!username.value.trim() || !password.value) {
+    error.value = 'Username and password are required'
+    return
+  }
+
+
+  if (password.value.length < 6) {
+   error.value = 'Password must be at least 6 characters'
+    return
+  }
+  
   try {
     const res = await axios.post('/api/auth/login', {
       username: username.value,

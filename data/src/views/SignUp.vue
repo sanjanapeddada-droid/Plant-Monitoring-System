@@ -32,6 +32,25 @@
   const router   = useRouter()
   
   async function handleSignUp() {
+     error.value = null
+
+ if (!username.value.trim() || !fullName.value.trim() || !password.value) {
+    error.value = 'All fields are required'
+    return
+  }
+
+
+  const nameRe = /^[a-zA-Z0-9_]+$/
+  if (!nameRe.test(username.value)) {
+    error.value = 'Username must be alphanumeric'
+    return
+  }
+
+ if (password.value.length < 6) {
+    error.value = 'Password must be at least 6 characters'
+    return
+  }
+
     try {
       await axios.post('/api/auth/signup', {
         username: username.value,
