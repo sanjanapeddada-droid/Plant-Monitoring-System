@@ -2,7 +2,7 @@ import express from 'express'
 import cors    from 'cors'
 import dotenv  from 'dotenv'
 dotenv.config()
-
+import mqtt from 'mqtt'
 import authRoutes  from './routes/auth.js'
 import plantRoutes from './routes/plants.js'
 import { pool } from './db.js'
@@ -11,7 +11,7 @@ import './mqttClient.js'
 const app = express()
 app.use(cors())
 app.use(express.json())
-
+const client = mqtt.connect('ws://localhost:9001')
 
 app.use('/api/auth', authRoutes)
 
@@ -35,7 +35,16 @@ app.get('/api/plant_profiles', async (req, res) => {
 app.listen(PORT, () => console.log(`API listening on port ${PORT}`))
 
 
+client.on('connect', () => {
+  console.log('WS MQTT connected')
+  client.subscribe('wio/moisture')
+})
 
+client.on('message', (topic, msg) => {
+  const data = JSON.parse(msg.toString())
+  console.log(topic, data)
+  
+})
 
 
 
