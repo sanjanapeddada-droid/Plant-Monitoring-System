@@ -36,7 +36,8 @@ router.get('/user/:id', async (req, res) => {
        FROM user_plants up
        JOIN plant_profiles p
        ON up.plant_type_id = p.id
-       WHERE up.user_id = ?`,
+       WHERE up.user_id = ?
+       ORDER BY p.name ASC`,
       [userId]
     )
     res.json(rows)
