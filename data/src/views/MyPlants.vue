@@ -1,51 +1,102 @@
 <script setup>
-import { ref, onMounted } from 'vue';
-import axios from 'axios';
+import { ref, onMounted } from 'vue'
+import axios from 'axios'
 
-const plants = ref([]);
-const USER_ID = 1; // replace with ID later (every time someone signs up, they get a unique id)
+const plants = ref([])
+const USER_ID = 1 // Replace with actual user ID
 
 onMounted(async () => {
-  const res = await fetch(`http://localhost:3000/api/plants/user/${USER_ID}`);
-  const data = await res.json();
-  console.log('🪴 user plants:', data);
-  plants.value = data;
-});
+  await fetchPlants()
+})
 
+const fetchPlants = async () => {
+  try {
+    const res = await axios.get(`http://localhost:3000/api/plants/user/${USER_ID}`)
+    plants.value = res.data
+    console.log('🪴 user plants:', plants.value)
+  } catch (err) {
+    console.error('❌ Error fetching user plants:', err)
+  }
+}
+const deletePlant = async (userPlantId) => {
+  try {
+    const token = localStorage.getItem('token')
+    await axios.delete(`http://localhost:3000/api/plants/user/${userPlantId}`, {
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
+    })
+    plants.value = plants.value.filter(p => p.userPlantId !== userPlantId)
+  } catch (err) {
+    console.error('❌ Error deleting plant:', err)
+  }
+}
 
 
 </script>
 
 <template>
-  <div class="my-plants">
-    <h2>My Plants</h2>
-    <ul>
-      <li v-for="p in plants" :key="p.userPlantId">
-        {{ p.name }} —
-        Moisture: {{ p.min_percentage }}–{{ p.max_percentage }}%
-        <br/>
-        Needs: {{ p.light_requirement }}
-      </li>
-    </ul>
+  <div class="plant-sections">
+    <div class="my-plants">
+      <h2>My Plants</h2>
+      <ul>
+        <li v-for="p in plants" :key="p.userPlantId">
+          {{ p.name }} —
+          Moisture: {{ p.min_percentage }}–{{ p.max_percentage }}%
+          <br />
+          Needs: {{ p.light_requirement }}
+          <button class="delete-btn" @click="deletePlant(p.userPlantId)">Delete</button>
+        </li>
+      </ul>
+    </div>
+
+    <div class="active-plants">
+      <h2>Active Plants</h2>
+      <p>No active plants yet.</p>
+    </div>
   </div>
 </template>
 
 <style scoped>
-.my-plants {
-  background: #f0fff4;        
-  border: 2px solid #e91e63; 
+.plant-sections {
+  display: flex;
+  gap: 2rem;
+  flex-wrap: wrap;
+}
+
+.my-plants, .active-plants {
+  flex: 1;
+  min-width: 300px;
+  background: #f0fff4;
+  border: 2px solid #e91e63;
   border-radius: 8px;
   padding: 1.5rem;
 }
 
-.my-plants h2 {
-  color: #4caf50;           
+.my-plants h2, .active-plants h2 {
+  color: #4caf50;
 }
 
 .my-plants li {
   margin: 0.75rem 0;
   padding: 0.5rem;
   background: #ffffff;
-  border-left: 4px solid #e91e63; 
+  border-left: 4px solid #e91e63;
+  position: relative;
+}
+
+.delete-btn {
+  background-color: #e53935;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  padding: 0.4rem 0.8rem;
+  margin-top: 0.5rem;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.delete-btn:hover {
+  background-color: #c62828;
 }
 </style>

@@ -19,7 +19,7 @@ const routes = [
     children: [
       { path: 'myplants',      component: MyPlants },
       { path: 'activesensors', component: ActiveSensors },
-      { path: 'plantdatabase', component: PlantDatabase }
+      { path: 'plantdatabase', name: PlantDatabase ,component: PlantDatabase }
     ]
   },
 
