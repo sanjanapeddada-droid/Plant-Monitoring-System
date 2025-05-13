@@ -16,19 +16,21 @@ SubscribeToLightTopic(selectedID);
 
 // Handle moisture messages
 moistureClient.on('message', (topic, message) => {
-  if (topic.includes('/moisture')) {
-    CompareMoistureData(topic, message, selectedID);
+  const match = topic.match(/plant\/(\d+)\/moisture/);
+  if (match) {
+    const plantID = parseInt(match[1]);
+    CompareMoistureData(topic, message, plantID);
   }
 });
 
-// Handle temperature messages
+// Handle temperature messages(MUST BE CHANGED)
 tempClient.on('message', (topic, message) => {
   if (topic.includes('/temp')) {
     CompareTemperatureData(topic, message, selectedID);
   }
 });
 
-// Handle light messages
+// Handle light messages(MUST BE CHANGED)
 lightClient.on('message', (topic, message) => {
   if (topic.includes('/light')) {
     CompareLightData(topic, message, selectedID);
