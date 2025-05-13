@@ -7,7 +7,12 @@ WiFiClient wifiClient;
 PubSubClient client(wifiClient);
 
 int moisturePin = A0; 
-const char* topic = "wio/moisture"; 
+#pragma once                                    //Make sure it is only included once in a compilation    
+
+const char* ssid = "...";                  
+const char* password = "...";           
+const char* mqtt_server = "..."; // change to computers ip
+const int mqttPort = 1883;
 
 void setup() {
   Serial.begin(115200); 
@@ -55,6 +60,6 @@ void loop() {
   sprintf(payload, "%d", moistureValue);
   client.publish(topic, payload);
 
-  delay(1800000); // Send every 30 minutes
+  delay(500);
 
 }
