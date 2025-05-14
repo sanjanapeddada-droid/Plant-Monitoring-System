@@ -1,82 +1,91 @@
+<template>
+  <div class="plant-sections">
+    <!-- My Plants from DB -->
+    <div class="my-plants">
+      <h2>My Plants</h2>
+      <ul>
+        <li v-for="p in plants" :key="p.userPlantId">
+          {{ p.name }} — Moisture: {{ p.min_percentage }}–{{ p.max_percentage }}%
+          <br />
+          Needs: {{ p.light_requirement }}
+          <button class="delete-btn" @click="deletePlant(p.userPlantId)">
+            Delete
+          </button>
+        </li>
+      </ul>
+    </div>
+
+    <!-- Active Plants from MQTT -->
+    <div class="active-plants">
+      <h2>Active Plants</h2>
+      <div v-if="activeMoisture !== null">
+        <strong>Live Moisture Reading:</strong> {{ activeMoisture }}
+      </div>
+      <p v-else>No active sensor data received yet.</p>
+    </div>
+  </div>
+</template>
+
 <script setup>
 import { ref, onMounted } from 'vue'
-import axios from 'axios'
-const plants = ref([])
-const USER_ID = 1 // Replace with actual user ID
+import mqtt           from 'mqtt'
+import axios          from 'axios'
 
-onMounted(() => {
-  fetchPlants()
-  setupMQTT()
-})
+const plants         = ref([])
+const activeMoisture = ref(null)
+const USER_ID        = 1
+
+// — fetch DB plants
 const fetchPlants = async () => {
   try {
-    const res = await axios.get(`http://localhost:3000/api/plants/user/${USER_ID}`)
+    const res = await axios.get(
+      `http://localhost:3000/api/plants/user/${USER_ID}`
+    )
     plants.value = res.data
-    console.log('🪴 user plants:', plants.value)
   } catch (err) {
     console.error('Error fetching user plants:', err)
   }
 }
 
-
-
-
-const deletePlant = async (userPlantId) => {
+// — delete a plant
+const deletePlant = async (id) => {
   try {
     const token = localStorage.getItem('token')
-    await axios.delete(`http://localhost:3000/api/plants/user/${userPlantId}`, {
-      headers: {
-        Authorization: `Bearer ${token}`
-      }
-    })
-    plants.value = plants.value.filter(p => p.userPlantId !== userPlantId)
+    await axios.delete(
+      `http://localhost:3000/api/plants/user/${id}`,
+      { headers: { Authorization: `Bearer ${token}` } }
+    )
+    plants.value = plants.value.filter(p => p.userPlantId !== id)
   } catch (err) {
-    console.error(' Error deleting plant:', err)
+    console.error('Error deleting plant:', err)
   }
 }
-// MQTT connection
+
+// — subscribe via MQTT over WebSocket
 const setupMQTT = () => {
-  const client = mqtt.connect('ws://localhost:9001') // change to your IP if needed
+  const client = mqtt.connect('ws://localhost:9001')  // → MQTT broker’s WS port
 
   client.on('connect', () => {
-    console.log(' Connected to MQTT broker')
+    console.log('☁️ MQTT over WS connected')
     client.subscribe('wio/moisture')
   })
 
-  client.on('message', (topic, message) => {
+  client.on('message', (topic, msg) => {
     if (topic === 'wio/moisture') {
-      activeMoisture.value = message.toString()
+      activeMoisture.value = msg.toString()
     }
+  })
+
+  client.on('error', err => {
+    console.error('MQTT error:', err)
   })
 }
 
-
+onMounted(() => {
+  fetchPlants()    // △ load your DB plants
+  setupMQTT()      // △ start live sensor feed
+})
 </script>
-
-<template>
-  <div class="plant-sections">
-    <div class="my-plants">
-      <h2>My Plants</h2>
-      <ul>
-        <li v-for="p in plants" :key="p.userPlantId">
-          {{ p.name }} —
-          Moisture: {{ p.min_percentage }}–{{ p.max_percentage }}%
-          <br />
-          Needs: {{ p.light_requirement }}
-          <button class="delete-btn" @click="deletePlant(p.userPlantId)">Delete</button>
-        </li>
-      </ul>
-    </div>
-
-   <div class="active-plants">
-  <h2>Active Plants</h2>
-  <div v-if="activeMoisture">
-    <strong>Live Moisture Reading:</strong> {{ activeMoisture }}
-  </div>
-  <p v-else>No active sensor data received yet.</p>
-    </div>
-  </div>
-</template>
 
 <style scoped>
 .plant-sections {
