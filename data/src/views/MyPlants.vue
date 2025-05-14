@@ -1,7 +1,6 @@
 <script setup>
 import { ref, onMounted } from 'vue'
 import axios from 'axios'
-
 const plants = ref([])
 const USER_ID = 1 // Replace with actual user ID
 
@@ -15,9 +14,13 @@ const fetchPlants = async () => {
     plants.value = res.data
     console.log('🪴 user plants:', plants.value)
   } catch (err) {
-    console.error('❌ Error fetching user plants:', err)
+    console.error('Error fetching user plants:', err)
   }
 }
+
+
+
+
 const deletePlant = async (userPlantId) => {
   try {
     const token = localStorage.getItem('token')
@@ -36,7 +39,7 @@ const setupMQTT = () => {
   const client = mqtt.connect('ws://localhost:9001') // change to your IP if needed
 
   client.on('connect', () => {
-    console.log('📡 Connected to MQTT broker')
+    console.log(' Connected to MQTT broker')
     client.subscribe('wio/moisture')
   })
 

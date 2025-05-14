@@ -2,6 +2,7 @@ import express from 'express'
 import { pool } from '../db.js'
 import jwt from 'jsonwebtoken'
 
+
 const router = express.Router()
 
 // Middleware to verify JWT token
@@ -64,5 +65,7 @@ router.post('/add', verifyToken, async (req, res) => {
     res.status(500).json({ message: 'Error adding plant to user list' })
   }
 })
+
+
 
 export default router

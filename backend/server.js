@@ -21,7 +21,6 @@ app.use('/api/plants', plantRoutes)
 const PORT = process.env.PORT || 3000
 
 
-
 app.get('/api/plant_profiles', async (req, res) => {
     try {
       const [rows] = await pool.query('SELECT * FROM plant_profiles');
@@ -40,11 +39,9 @@ client.on('connect', () => {
   client.subscribe('wio/moisture')
 })
 
-client.on('message', (topic, msg) => {
-  const data = JSON.parse(msg.toString())
-  console.log(topic, data)
+
   
-})
+
 
 
 

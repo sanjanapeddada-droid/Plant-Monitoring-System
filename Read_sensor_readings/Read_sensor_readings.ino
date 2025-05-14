@@ -10,7 +10,7 @@ int moisturePin = A0;
 #pragma once                                    //Make sure it is only included once in a compilation    
 
 const char* ssid = "...";                  
-const char* password = "...";           
+const char* password = "...";  
 const char* mqtt_server = "..."; // change to computers ip
 const int mqttPort = 1883;
 
