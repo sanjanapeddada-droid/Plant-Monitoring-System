@@ -1,23 +1,26 @@
 <script setup>
 import { ref, onMounted } from 'vue'
 import axios from 'axios'
-
 const plants = ref([])
 const USER_ID = 1 // Replace with actual user ID
 
-onMounted(async () => {
-  await fetchPlants()
+onMounted(() => {
+  fetchPlants()
+  setupMQTT()
 })
-
 const fetchPlants = async () => {
   try {
     const res = await axios.get(`http://localhost:3000/api/plants/user/${USER_ID}`)
     plants.value = res.data
     console.log('🪴 user plants:', plants.value)
   } catch (err) {
-    console.error('❌ Error fetching user plants:', err)
+    console.error('Error fetching user plants:', err)
   }
 }
+
+
+
+
 const deletePlant = async (userPlantId) => {
   try {
     const token = localStorage.getItem('token')
@@ -28,8 +31,23 @@ const deletePlant = async (userPlantId) => {
     })
     plants.value = plants.value.filter(p => p.userPlantId !== userPlantId)
   } catch (err) {
-    console.error('❌ Error deleting plant:', err)
+    console.error(' Error deleting plant:', err)
   }
+}
+// MQTT connection
+const setupMQTT = () => {
+  const client = mqtt.connect('ws://localhost:9001') // change to your IP if needed
+
+  client.on('connect', () => {
+    console.log(' Connected to MQTT broker')
+    client.subscribe('wio/moisture')
+  })
+
+  client.on('message', (topic, message) => {
+    if (topic === 'wio/moisture') {
+      activeMoisture.value = message.toString()
+    }
+  })
 }
 
 
@@ -50,9 +68,12 @@ const deletePlant = async (userPlantId) => {
       </ul>
     </div>
 
-    <div class="active-plants">
-      <h2>Active Plants</h2>
-      <p>No active plants yet.</p>
+   <div class="active-plants">
+  <h2>Active Plants</h2>
+  <div v-if="activeMoisture">
+    <strong>Live Moisture Reading:</strong> {{ activeMoisture }}
+  </div>
+  <p v-else>No active sensor data received yet.</p>
     </div>
   </div>
 </template>
