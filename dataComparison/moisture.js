@@ -1,5 +1,4 @@
-import { pool } from './db.js';
-import { io } from '../backend/server.js'; // adjust path as needed
+import { io } from '../backend/server.js';  // Assuming you have access to socket.io to emit notifications
 
 export const CompareMoistureData = async (topic, message, plantID) => {
   try {
@@ -10,7 +9,7 @@ export const CompareMoistureData = async (topic, message, plantID) => {
       `SELECT min_percentage, max_percentage, min_sensor_output, max_sensor_output
        FROM plants
        WHERE id = ?`,
-      [plantID]
+      [plantID]  // Dynamically pass the plantID
     );
 
     if (rows.length === 0) {
@@ -24,23 +23,23 @@ export const CompareMoistureData = async (topic, message, plantID) => {
     let MoisturePercent = 100 * (max_sensor_output - SensorValue) / (max_sensor_output - min_sensor_output);
     MoisturePercent = Math.max(0, Math.min(100, Math.round(MoisturePercent)));
 
-    console.log(`Moisture Percentage: ${MoisturePercent}% (Sensor Value: ${SensorValue})`);
+    console.log(`Moisture Percentage for Plant ${plantID}: ${MoisturePercent}% (Sensor Value: ${SensorValue})`);
 
     // Emit notifications based on thresholds
     if (MoisturePercent < min_percentage) {
       const message = `Moisture too low for plant ${plantID}! (${MoisturePercent}%)`;
       console.warn(message);
-      io.emit('notification', { type: 'warning', message });
+      io.emit('notification', { type: 'warning', message });  // Emit warning notification
     } 
     else if (MoisturePercent > max_percentage) {
       const message = `Moisture too high for plant ${plantID}! (${MoisturePercent}%)`;
       console.warn(message);
-      io.emit('notification', { type: 'warning', message });
+      io.emit('notification', { type: 'warning', message });  // Emit warning notification
     } 
     else {
       const message = `Moisture is normal for plant ${plantID}. (${MoisturePercent}%)`;
       console.log(message);
-      io.emit('notification', { type: 'success', message });
+      io.emit('notification', { type: 'success', message });  // Emit success notification
     }
 
   } catch (error) {

@@ -6,13 +6,7 @@ import { CompareMoistureData } from './moisture.js';
 import { CompareTemperatureData } from './temp.js';
 import { CompareLightData } from './light.js';
 
-// User selects plant_id
-const selectedID = 3; // Will be replaced with user input
 
-// Subscribe to sensor topics
-SubscribeToMoistureTopic(selectedID);
-SubscribeToTemperatureTopic(selectedID);
-SubscribeToLightTopic(selectedID);
 
 // Handle moisture messages
 moistureClient.on('message', (topic, message) => {
@@ -24,15 +18,15 @@ moistureClient.on('message', (topic, message) => {
 });
 
 // Handle temperature messages(MUST BE CHANGED)
-tempClient.on('message', (topic, message) => {
-  if (topic.includes('/temp')) {
-    CompareTemperatureData(topic, message, selectedID);
-  }
-});
+//tempClient.on('message', (topic, message) => {
+  //if (topic.includes('/temp')) {
+//CompareTemperatureData(topic, message, selectedID);
+  //}
+//});
 
 // Handle light messages(MUST BE CHANGED)
-lightClient.on('message', (topic, message) => {
-  if (topic.includes('/light')) {
-    CompareLightData(topic, message, selectedID);
-  }
-});
+//lightClient.on('message', (topic, message) => {
+  //if (topic.includes('/light')) {
+    //CompareLightData(topic, message, selectedID);
+  //}
+//});

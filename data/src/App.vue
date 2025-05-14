@@ -51,7 +51,7 @@ import { ref, computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { auth } from './stores/auth'
 import socket from './utils/socket'
-import Notification from './components/Notification.vue'
+import Notification from './views/Notification.vue'
 
 // Access the router
 const router = useRouter()
