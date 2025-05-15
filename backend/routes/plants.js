@@ -2,6 +2,7 @@ import express from 'express'
 import { pool } from '../db.js'
 import jwt from 'jsonwebtoken'
 
+
 const router = express.Router()
 
 // Middleware to verify JWT token
@@ -64,6 +65,32 @@ router.post('/add', verifyToken, async (req, res) => {
     res.status(500).json({ message: 'Error adding plant to user list' })
   }
 })
+// DELETE a user_plant by its record ID
+router.delete(
+  '/user/:id',
+  verifyToken,               
+  async (req, res) => {
+    const userPlantId = req.params.id
+    const userId      = req.userId   
+     console.log(`DELETE /api/plants/user/${userPlantId} called by user ${userId}`)
+
+    try {
+      const [result] = await pool.query(
+        'DELETE FROM user_plants WHERE id = ? AND user_id = ?',
+        [userPlantId, userId]
+      )
+      if (result.affectedRows === 0) {
+        return res.status(404).json({ message: 'Plant not found' })
+      }
+      res.json({ message: 'Plant deleted successfully' })
+    } catch (err) {
+      console.error('Error deleting user plant:', err)
+      res.status(500).json({ message: 'Error deleting plant' })
+    }
+  }
+)
+
+
 
 // Frontend: sending the plant name
 async function onPlantSelected(plantName) {
