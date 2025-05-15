@@ -1,5 +1,10 @@
 <template>
   <div id="app">
+    <Notification
+  v-if="notification"
+  :type="notification.type"
+  :message="notification.message"/>
+
     <aside class="sidebar">
       <h1 class="title">Plant Monitoring</h1>
       <nav>
@@ -39,24 +44,41 @@
   </div>
 </template>
 
+
+
 <script setup>
-import { computed } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
-// Import the auth store
 import { auth } from './stores/auth'
+import socket from './utils/socket'
+import Notification from './views/Notification.vue'
 
 // Access the router
 const router = useRouter()
 
-// Computed property to check if the user is logged in using the auth store
+// Computed property to check if the user is logged in
 const isLoggedIn = computed(() => auth.isLoggedIn)
 
-// Function to handle sign out (logout)
+// Logout function
 function signOut() {
-  auth.logout()  // Clear the user data and token from the store and localStorage
-  router.push('/login')  // Redirect to the login page
+  auth.logout()
+  router.push('/login')
 }
+
+// Notification state
+const notification = ref(null)
+
+// Listen for notifications from backend
+onMounted(() => {
+  socket.on('notification', (data) => {
+    notification.value = data
+    setTimeout(() => {
+      notification.value = null
+    }, 5000) // Hide after 5 seconds
+  })
+})
 </script>
+
 
 <style>
 #app {

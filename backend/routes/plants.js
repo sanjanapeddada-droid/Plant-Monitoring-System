@@ -92,4 +92,28 @@ router.delete(
 
 
 
+// Frontend: sending the plant name
+async function onPlantSelected(plantName) {
+  try {
+    const response = await fetch('http://localhost:3000/api/select-plant', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ plantName })
+    });
+
+    const data = await response.json();
+
+    if (response.ok) {
+      console.log(` Subscribed to plant: ${plantName}, ID: ${data.plantID}`);
+      // Optional: Trigger UI changes or notifications
+    } else {
+      console.error(` Error: ${data.error}`);
+    }
+  } catch (error) {
+    console.error(' Network error:', error);
+  }
+}
+
 export default router

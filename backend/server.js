@@ -1,48 +1,71 @@
 import express from 'express'
-import cors    from 'cors'
-import dotenv  from 'dotenv'
-dotenv.config()
+import cors from 'cors'
+import dotenv from 'dotenv'
+import http from 'http'
 import mqtt from 'mqtt'
-import authRoutes  from './routes/auth.js'
+import { Server as SocketIO } from 'socket.io'
+
+import authRoutes from './routes/auth.js'
 import plantRoutes from './routes/plants.js'
+import selectPlantRoute from './routes/select-plant.js'
 import { pool } from './db.js'
-import './mqttClient.js'
 
+dotenv.config()
+
+// Initialize Express app and HTTP server
 const app = express()
-app.use(cors())
-app.use(express.json())
-const client = mqtt.connect('ws://...')  //change to computers ip
+const server = http.createServer(app)
 
-app.use('/api/auth', authRoutes)
-
-
-app.use('/api/plants', plantRoutes)
-
-const PORT = process.env.PORT || 3000
-
-
-app.get('/api/plant_profiles', async (req, res) => {
-    try {
-      const [rows] = await pool.query('SELECT * FROM plant_profiles');
-      res.json(rows);
-    } catch (err) {
-      console.error(err);
-      res.status(500).json({ error: 'Could not load plant profiles' });
-    }
-  });
-  
-app.listen(PORT, () => console.log(`API listening on port ${PORT}`))
-
-
-client.on('connect', () => {
-  console.log('WS MQTT connected')
-  client.subscribe('wio/moisture')
+// Set up Socket.IO for real-time communication
+export const io = new SocketIO(server, {
+  cors: {
+    origin: '*', // Update this to your frontend URL in production
+    methods: ['GET', 'POST']
+  }
 })
 
+// Middleware
+app.use(cors())
+app.use(express.json())
 
-  
+// API Routes
+app.use('/api/auth', authRoutes)
+app.use('/api/plants', plantRoutes)
+app.use('/api/select-plant', selectPlantRoute)
 
+// Example API Endpoint
+app.get('/api/plant_profiles', async (req, res) => {
+  try {
+    const [rows] = await pool.query('SELECT * FROM plant_profiles')
+    res.json(rows)
+  } catch (err) {
+    console.error(err)
+    res.status(500).json({ error: 'Could not load plant profiles' })
+  }
+})
 
+// MQTT Client Setup
+const mqttClient = mqtt.connect('ws://<YOUR_COMPUTER_IP>:<PORT>') // 🔁 Replace with actual IP and port
 
+mqttClient.on('connect', () => {
+  console.log('WS MQTT connected')
+  mqttClient.subscribe('wio/moisture', (err) => {
+    if (err) console.error('Subscription error:', err)
+  })
+})
 
+mqttClient.on('message', (topic, message) => {
+  if (topic === 'wio/moisture') {
+    const moistureData = message.toString()
+    console.log(`Moisture Data Received: ${moistureData}`)
 
+    // Emit to all connected WebSocket clients
+    io.emit('moisture_update', { moisture: moistureData })
+  }
+})
+
+// Start HTTP + WebSocket Server
+const PORT = process.env.PORT || 3000
+server.listen(PORT, () => {
+  console.log(`Server + WebSocket running on port ${PORT}`)
+})
