@@ -1,24 +1,25 @@
 import express from 'express'
 import cors from 'cors'
 import dotenv from 'dotenv'
-import http from 'http'             // 🔸 Import Node's HTTP module
-import { Server as SocketIO } from 'socket.io'  // 🔸 Import Socket.IO
-import selectPlantRoute from './routes/select-plant.js';
-
-dotenv.config()
+import http from 'http'
+import mqtt from 'mqtt'
+import { Server as SocketIO } from 'socket.io'
 
 import authRoutes from './routes/auth.js'
 import plantRoutes from './routes/plants.js'
+import selectPlantRoute from './routes/select-plant.js'
 import { pool } from './db.js'
 
-// Initialize app and HTTP server
-const app = express()
-const server = http.createServer(app) // 🔸 Create HTTP server manually
+dotenv.config()
 
-// Set up Socket.IO
+// Initialize Express app and HTTP server
+const app = express()
+const server = http.createServer(app)
+
+// Set up Socket.IO for real-time communication
 export const io = new SocketIO(server, {
   cors: {
-    origin: '*', // You can restrict this to your frontend origin
+    origin: '*', // Update this to your frontend URL in production
     methods: ['GET', 'POST']
   }
 })
@@ -27,11 +28,12 @@ export const io = new SocketIO(server, {
 app.use(cors())
 app.use(express.json())
 
-// Routes
+// API Routes
 app.use('/api/auth', authRoutes)
 app.use('/api/plants', plantRoutes)
+app.use('/api/select-plant', selectPlantRoute)
 
-// Test API route
+// Example API Endpoint
 app.get('/api/plant_profiles', async (req, res) => {
   try {
     const [rows] = await pool.query('SELECT * FROM plant_profiles')
@@ -42,11 +44,28 @@ app.get('/api/plant_profiles', async (req, res) => {
   }
 })
 
-// MQTT logic should now use `io` for real-time emits
-import '/Users/sanjanapvk/Documents/Project-Sys_Dev/plant-monitoring-system-1/dataComparison/mqttClientMoisture.js' // Make sure your moisture.js uses `io.emit(...)`
+// MQTT Client Setup
+const mqttClient = mqtt.connect('ws://<YOUR_COMPUTER_IP>:<PORT>') // 🔁 Replace with actual IP and port
 
-// Listen on HTTP server, not app
+mqttClient.on('connect', () => {
+  console.log('WS MQTT connected')
+  mqttClient.subscribe('wio/moisture', (err) => {
+    if (err) console.error('Subscription error:', err)
+  })
+})
+
+mqttClient.on('message', (topic, message) => {
+  if (topic === 'wio/moisture') {
+    const moistureData = message.toString()
+    console.log(`Moisture Data Received: ${moistureData}`)
+
+    // Emit to all connected WebSocket clients
+    io.emit('moisture_update', { moisture: moistureData })
+  }
+})
+
+// Start HTTP + WebSocket Server
 const PORT = process.env.PORT || 3000
-server.listen(PORT, () => console.log(`Server + WebSocket running on port ${PORT}`))
-
-app.use('/api/select-plant', selectPlantRoute);
+server.listen(PORT, () => {
+  console.log(`Server + WebSocket running on port ${PORT}`)
+})
