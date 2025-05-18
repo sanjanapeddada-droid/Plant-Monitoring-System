@@ -39,6 +39,7 @@ async function deleteAccount() {
     }, {
       headers: { Authorization: `Bearer ${token}` }
     })
+   
 
     success.value = res.data.message
     auth.logout()
