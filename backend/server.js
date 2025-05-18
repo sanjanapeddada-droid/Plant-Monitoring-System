@@ -45,7 +45,8 @@ app.get('/api/plant_profiles', async (req, res) => {
 })
 
 // MQTT Client Setup
-const mqttClient = mqtt.connect('ws://<YOUR_COMPUTER_IP>:<PORT>') // 🔁 Replace with actual IP and port
+const mqttClient = mqtt.connect(process.env.MQTT_BROKER || 'ws://localhost:9001')
+
 
 mqttClient.on('connect', () => {
   console.log('WS MQTT connected')
