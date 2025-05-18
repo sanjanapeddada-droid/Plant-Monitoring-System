@@ -45,22 +45,36 @@ app.get('/api/plant_profiles', async (req, res) => {
 })
 
 // MQTT Client Setup
-const mqttClient = mqtt.connect('ws://<YOUR_COMPUTER_IP>:<PORT>') // 🔁 Replace with actual IP and port
+const mqttClient = mqtt.connect(process.env.MQTT_BROKER || 'ws://localhost:9001')// 🔁 Replace with actual IP and port
 
 mqttClient.on('connect', () => {
   console.log('WS MQTT connected')
   mqttClient.subscribe('wio/moisture', (err) => {
     if (err) console.error('Subscription error:', err)
   })
+  mqttClient.subscribe('wio/temperature', (err) => {
+    if (err) console.error('Subscription error:', err)
+    })
+  mqttClient.subscribe('wio/humidity', (err) => {
+    if (err) console.error('Subscription error:', err)
+    })
 })
 
 mqttClient.on('message', (topic, message) => {
-  if (topic === 'wio/moisture') {
-    const moistureData = message.toString()
-    console.log(`Moisture Data Received: ${moistureData}`)
-
-    // Emit to all connected WebSocket clients
-    io.emit('moisture_update', { moisture: moistureData })
+  const payload = message.toString()
+  // decide the event name by topic
+  switch (topic) {
+    case 'wio/moisture':
+      io.emit('moisture_update',   { moisture: payload })
+      break
+    case 'wio/temperature':
+      io.emit('temperature_update',{ temperature: payload })
+      break
+    case 'wio/humidity':
+      io.emit('humidity_update',   { humidity: payload })
+      break
+    default:
+      console.warn('Unexpected topic:', topic)
   }
 })
 
