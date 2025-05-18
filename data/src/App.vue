@@ -35,6 +35,9 @@
           <li v-if="isLoggedIn">
             <router-link to="/menu/plantdatabase">Plant Database</router-link>
           </li>
+          <li v-if="isLoggedIn">
+            <router-link to="/account/delete">Delete Account</router-link>
+          </li>
         </ul>
       </nav>
     </aside>
