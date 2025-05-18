@@ -1,12 +1,23 @@
-// backend/routes/auth.js
+
 import express from 'express'
 import bcrypt  from 'bcryptjs'
 import jwt     from 'jsonwebtoken'
 import { pool } from '../db.js'
-import { authenticateToken } from '../middleware/auth.js'
+
 
 const router = express.Router()
+function authenticateToken(req, res, next) {
+  const authHeader = req.headers['authorization']
+  const token = authHeader && authHeader.split(' ')[1]
 
+  if (!token) return res.sendStatus(401)
+
+  jwt.verify(token, process.env.JWT_SECRET, (err, user) => {
+    if (err) return res.sendStatus(403)
+    req.user = user
+    next()
+  })
+}
 // 1) Sign Up
 router.post('/signup', async (req, res) => {
   const { username, full_name, password } = req.body
@@ -112,5 +123,7 @@ router.post('/delete', authenticateToken, async (req, res) => {
     res.status(500).json({ error: 'Could not delete account' })
   }
 })
+
+
 
 export default router

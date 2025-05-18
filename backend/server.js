@@ -4,7 +4,6 @@ import dotenv from 'dotenv'
 import http from 'http'
 import mqtt from 'mqtt'
 import { Server as SocketIO } from 'socket.io'
-
 import authRoutes from './routes/auth.js'
 import plantRoutes from './routes/plants.js'
 import selectPlantRoute from './routes/select-plant.js'
