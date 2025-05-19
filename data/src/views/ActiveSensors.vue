@@ -1,67 +1,72 @@
 <template>
   <div class="active-sensors">
-    <h2>Active Sensors</h2>
-    <ul>
-      <li v-for="sensor in sensors" :key="sensor.id">
-        {{ sensor.name }} → Status: {{ sensor.status }}, Value: {{ sensor.value }}
-      </li>
-    </ul>
+    <h2>Live Sensor Readings</h2>
+
+    <div v-if="sensorData">
+      <ul>
+        <li><strong>Moisture:</strong> {{ sensorData.moisture }}</li>
+        <li><strong>Temperature:</strong> {{ sensorData.temperature }} °C</li>
+        <li><strong>Light:</strong> {{ sensorData.light }} lux</li>
+        <li><strong>Humidity:</strong> {{ sensorData.humidity }} %</li>
+        <li><strong>Water:</strong> {{ sensorData.water }} mL</li>
+      </ul>
+    </div>
+
+    <p v-else>No data received yet from sensors.</p>
   </div>
 </template>
 
 <script setup>
-import { ref, onMounted, onUnmounted } from 'vue'
-import { io }                       from 'socket.io-client'
+import { ref, onMounted } from 'vue'
+import mqtt from 'mqtt'
 
-const sensors = ref([
-  { id: 'moisture',    name: 'Soil Moisture Sensor', status: 'Connecting…', value: '—' },
-  { id: 'temperature', name: 'Temperature Sensor',   status: 'Connecting…', value: '—' },
-  { id: 'humidity',    name: 'Humidity Sensor',      status: 'Connecting…', value: '—' }
-])
+const sensorData = ref(null)
 
-// connect to Socket.IO server
-const socket = io('http://localhost:3000')
+const setupMQTT = () => {
+  const client = mqtt.connect('ws://192.168.X.X:9001') // 🛠 replace with your IP
+
+  client.on('connect', () => {
+    console.log('☁️ MQTT connected')
+    client.subscribe('wio/readings')
+  })
+
+  client.on('message', (topic, message) => {
+    if (topic === 'wio/readings') {
+      try {
+        const payload = JSON.parse(message.toString())
+        sensorData.value = payload
+      } catch (err) {
+        console.error('Failed to parse MQTT message:', err)
+      }
+    }
+  })
+
+  client.on('error', err => {
+    console.error('MQTT error:', err)
+  })
+}
 
 onMounted(() => {
-  // moisture updates
-  socket.on('moisture_update', ({ moisture }) => {
-    const s = sensors.value.find(s => s.id === 'moisture')
-    if (s) { s.status = 'Active'; s.value = moisture + '%' }
-  })
-
-  // temperature updates
-  socket.on('temperature_update', ({ temperature }) => {
-    const s = sensors.value.find(s => s.id === 'temperature')
-    if (s) { s.status = 'Active'; s.value = temperature + '°C' }
-  })
-
-  // humidity updates
-  socket.on('humidity_update', ({ humidity }) => {
-    const s = sensors.value.find(s => s.id === 'humidity')
-    if (s) { s.status = 'Active'; s.value = humidity + '%' }
-  })
-})
-
-onUnmounted(() => {
-  socket.disconnect()
+  setupMQTT()
 })
 </script>
 
 <style scoped>
 .active-sensors {
-  text-align: center;
-  padding: 2rem;
+  max-width: 500px;
+  margin: auto;
+  background: #f8fff8;
+  border: 2px solid #4caf50;
+  padding: 1.5rem;
+  border-radius: 10px;
 }
-.active-sensors h2 {
-  margin-bottom: 1rem;
-  color: #37c28a;
-}
-.active-sensors ul {
-  list-style: none;
+
+ul {
+  list-style-type: none;
   padding: 0;
 }
-.active-sensors li {
-  margin: 0.5rem 0;
-  font-size: 1.1rem;
+
+li {
+  margin-bottom: 0.5rem;
 }
 </style>
