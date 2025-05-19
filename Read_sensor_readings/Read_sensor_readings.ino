@@ -17,6 +17,8 @@ int waterPin = A6;
 const char* moistureTopic = "wio/moisture"; 
 const char* temperatureTopic = "wio/temperature";
 const char* humidityTopic = "wio/humidity";
+ 
+
 
 void setup() {
   pinMode(WIO_LIGHT, INPUT);
