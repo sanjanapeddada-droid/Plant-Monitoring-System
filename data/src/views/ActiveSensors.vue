@@ -23,7 +23,7 @@ import mqtt from 'mqtt'
 const sensorData = ref(null)
 
 const setupMQTT = () => {
-  const client = mqtt.connect('ws://192.168.X.X:9001') // 🛠 replace with your IP
+  const client = mqtt.connect('ws://192.168.6.117:9001') // 🛠 replace with your IP
 
   client.on('connect', () => {
     console.log('☁️ MQTT connected')
