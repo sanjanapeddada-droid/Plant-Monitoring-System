@@ -1,27 +1,22 @@
+image: node:18
+
 stages:
   - install
   - test
   - build
 
-# Backend install
 backend:
   stage: install
   script:
     - cd backend
     - npm install
-  artifacts:
-    paths:
-      - backend/node_modules/
 
-# Backend test placeholder 
 backend-tests:
   stage: test
   script:
     - cd backend
-    - echo "No backend tests implemented yet"
+    - echo "No tests yet"
 
-
-# Frontend build
 frontend:
   stage: build
   script:
