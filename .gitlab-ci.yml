@@ -5,22 +5,27 @@ stages:
   - test
   - build
 
+
 backend:
   stage: install
+  tags:
+    - docker
   script:
-    - node -v
-    - npm -v
     - cd backend
     - npm install
 
 backend-tests:
   stage: test
+  tags:
+    - docker
   script:
     - cd backend
     - echo "No tests yet"
 
 frontend:
   stage: build
+  tags:
+    - docker
   script:
     - cd data
     - npm install
