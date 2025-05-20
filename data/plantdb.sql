@@ -27,19 +27,18 @@ SET time_zone = "+00:00";
 --
 
 DROP TABLE IF EXISTS `plant_profiles`;
-CREATE TABLE IF NOT EXISTS `plant_profiles` (
-  `id` int NOT NULL AUTO_INCREMENT,
-  `name` varchar(100) COLLATE utf8mb4_general_ci NOT NULL,
-  `min_percentage` int NOT NULL,
-  `max_percentage` int NOT NULL,
-  `min_sensor_output` int NOT NULL,
-  `max_sensor_output` int NOT NULL,
-  `min_temp` decimal(5,2) NOT NULL,
-  `max_temp` decimal(5,2) NOT NULL,
-  `light_requirement` varchar(255) COLLATE utf8mb4_general_ci NOT NULL,
-  PRIMARY KEY (`id`),
-  UNIQUE KEY `name` (`name`)
-) ENGINE=MyISAM AUTO_INCREMENT=26 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+IF OBJECT_ID('plant_profiles', 'U') IS NOT NULL DROP TABLE plant_profiles;
+CREATE TABLE plant_profiles (
+  id INT IDENTITY(1,1) PRIMARY KEY,
+  name VARCHAR(100) NOT NULL UNIQUE,
+  min_percentage INT NOT NULL,
+  max_percentage INT NOT NULL,
+  min_sensor_output INT NOT NULL,
+  max_sensor_output INT NOT NULL,
+  min_temp DECIMAL(5,2) NOT NULL,
+  max_temp DECIMAL(5,2) NOT NULL,
+  light_requirement VARCHAR(255) NOT NULL
+);
 
 --
 -- Dumping data for table `plant_profiles`

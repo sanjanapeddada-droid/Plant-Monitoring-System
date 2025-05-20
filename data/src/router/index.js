@@ -6,6 +6,7 @@ import Menu          from '../views/Menu.vue'
 import MyPlants      from '../views/MyPlants.vue'
 import ActiveSensors from '../views/ActiveSensors.vue'
 import PlantDatabase from '../views/PlantDatabase.vue'
+import DeleteAccount from '../views/DeleteAccount.vue'
 
 const routes = [
   { path: '/dashboard', component: Dashboard },
@@ -22,9 +23,21 @@ const routes = [
       { path: 'plantdatabase', name: PlantDatabase ,component: PlantDatabase }
     ]
   },
+  {
+  path: '/account/delete',
+  name: 'DeleteAccount',
+  component: DeleteAccount, 
+  meta: { requiresAuth: true }
+},
 
 
-  { path: '/:pathMatch(.*)*', redirect: '/login' }
+  { path: '/:pathMatch(.*)*', redirect: '/login' },
+  {
+  path: '/menu/activesensors',
+  component: () => import('@/views/ActiveSensors.vue'),
+  meta: { requiresAuth: true }
+}
+
 ]
 
 const router = createRouter({

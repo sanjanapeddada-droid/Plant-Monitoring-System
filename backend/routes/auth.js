@@ -1,11 +1,23 @@
-// backend/routes/auth.js
+
 import express from 'express'
 import bcrypt  from 'bcryptjs'
 import jwt     from 'jsonwebtoken'
 import { pool } from '../db.js'
 
-const router = express.Router()
 
+const router = express.Router()
+function authenticateToken(req, res, next) {
+  const authHeader = req.headers['authorization']
+  const token = authHeader && authHeader.split(' ')[1]
+
+  if (!token) return res.sendStatus(401)
+
+  jwt.verify(token, process.env.JWT_SECRET, (err, user) => {
+    if (err) return res.sendStatus(403)
+    req.user = user
+    next()
+  })
+}
 // 1) Sign Up
 router.post('/signup', async (req, res) => {
   const { username, full_name, password } = req.body
@@ -74,5 +86,44 @@ router.post('/login', async (req, res) => {
     res.status(500).json({ message: 'Server error during login' });
   }
 });
+
+
+
+// POST /api/auth/delete — Protected account deletion
+router.post('/delete', authenticateToken, async (req, res) => {
+  const { username, password } = req.body
+  const userId = req.user.id
+
+  try {
+    // Check user exists and matches JWT
+    const [users] = await pool.query(
+      'SELECT * FROM users WHERE id = ? AND username = ?',
+      [userId, username]
+    )
+
+    if (users.length === 0)
+      return res.status(401).json({ error: 'Invalid user or username mismatch' })
+
+    const user = users[0]
+
+    // Validate password
+    const isMatch = await bcrypt.compare(password, user.password)
+    if (!isMatch)
+      return res.status(401).json({ error: 'Invalid password' })
+
+    // (Optional) delete related user data
+    await pool.query('DELETE FROM user_plants WHERE user_id = ?', [userId])
+
+    // Delete user
+    await pool.query('DELETE FROM users WHERE id = ?', [userId])
+
+    res.json({ message: 'Account deleted successfully' })
+  } catch (err) {
+    console.error(err)
+    res.status(500).json({ error: 'Could not delete account' })
+  }
+})
+
+
 
 export default router

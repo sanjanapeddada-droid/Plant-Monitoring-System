@@ -1,102 +1,97 @@
+<template>
+  <div class="plant-sections">
+    <!-- My Plants -->
+    <div class="my-plants">
+      <h2>My Plants</h2>
+      <ul>
+        <li v-for="p in inactivePlants" :key="p.userPlantId">
+          <strong>{{ p.name }}</strong><br />
+          Moisture: {{ p.min_percentage }}–{{ p.max_percentage }}%<br />
+          Needs: {{ p.light_requirement }}
+          <div class="buttons">
+            <button class="delete-btn" @click="deletePlant(p.userPlantId)">Delete</button>
+            <button class="activate-btn" @click="toggleActive(p.userPlantId)">Activate</button>
+          </div>
+        </li>
+      </ul>
+    </div>
+
+    <!-- Active Plant -->
+    <div class="active-plants">
+      <h2>Active Plant</h2>
+      <div v-if="activePlant" class="active-plant-card">
+        <p>
+          <strong>{{ activePlant.name }}</strong><br />
+          Moisture Range: {{ activePlant.min_percentage }}–{{ activePlant.max_percentage }}%<br />
+          Light: {{ activePlant.light_requirement }}<br />
+        </p>
+        <div class="buttons">
+          <button class="delete-btn" @click="deletePlant(activePlant.userPlantId)">Delete</button>
+          <button class="deactivate-btn" @click="toggleActive(activePlant.userPlantId)">Deactivate</button>
+        </div>
+      </div>
+      <p v-else>No active plant selected.</p>
+    </div>
+  </div>
+</template>
+
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, computed, onMounted } from 'vue'
+import mqtt from 'mqtt'
 import axios from 'axios'
 
+const USER_ID = 1
 const plants = ref([])
-const USER_ID = 1 // Replace with actual user ID
 
-onMounted(async () => {
-  await fetchPlants()
-})
+const activePlant = computed(() => plants.value.find(p => p.is_active === 1) || null)
+const inactivePlants = computed(() => plants.value.filter(p => p.is_active !== 1))
 
 const fetchPlants = async () => {
   try {
     const res = await axios.get(`http://localhost:3000/api/plants/user/${USER_ID}`)
-    plants.value = res.data
-    console.log('🪴 user plants:', plants.value)
+    plants.value = res.data.map(p => ({
+      ...p,
+      is_active: Number(p.is_active)
+    }))
   } catch (err) {
     console.error('❌ Error fetching user plants:', err)
   }
 }
-const deletePlant = async (userPlantId) => {
+
+const deletePlant = async (id) => {
   try {
     const token = localStorage.getItem('token')
-    await axios.delete(`http://localhost:3000/api/plants/user/${userPlantId}`, {
-      headers: {
-        Authorization: `Bearer ${token}`
-      }
+    await axios.delete(`http://localhost:3000/api/plants/user/${id}`, {
+      headers: { Authorization: `Bearer ${token}` }
     })
-    plants.value = plants.value.filter(p => p.userPlantId !== userPlantId)
+    plants.value = plants.value.filter(p => p.userPlantId !== id)
   } catch (err) {
     console.error('❌ Error deleting plant:', err)
   }
 }
 
+const toggleActive = async (userPlantId) => {
+  try {
+    const token = localStorage.getItem('token')
+    const selectedPlant = plants.value.find(p => p.userPlantId === userPlantId)
+    const isCurrentlyActive = selectedPlant?.is_active === 1
 
+    plants.value.forEach(p => {
+      p.is_active = isCurrentlyActive ? 0 : (p.userPlantId === userPlantId ? 1 : 0)
+    })
+
+    await axios.put(`http://localhost:3000/api/plants/user/${userPlantId}/activate`, {
+      deactivate: isCurrentlyActive
+    }, {
+      headers: { Authorization: `Bearer ${token}` }
+    })
+  } catch (err) {
+    await fetchPlants()
+    console.error('❌ Error toggling activation:', err)
+  }
+}
+
+onMounted(() => {
+  fetchPlants()
+})
 </script>
-
-<template>
-  <div class="plant-sections">
-    <div class="my-plants">
-      <h2>My Plants</h2>
-      <ul>
-        <li v-for="p in plants" :key="p.userPlantId">
-          {{ p.name }} —
-          Moisture: {{ p.min_percentage }}–{{ p.max_percentage }}%
-          <br />
-          Needs: {{ p.light_requirement }}
-          <button class="delete-btn" @click="deletePlant(p.userPlantId)">Delete</button>
-        </li>
-      </ul>
-    </div>
-
-    <div class="active-plants">
-      <h2>Active Plants</h2>
-      <p>No active plants yet.</p>
-    </div>
-  </div>
-</template>
-
-<style scoped>
-.plant-sections {
-  display: flex;
-  gap: 2rem;
-  flex-wrap: wrap;
-}
-
-.my-plants, .active-plants {
-  flex: 1;
-  min-width: 300px;
-  background: #f0fff4;
-  border: 2px solid #e91e63;
-  border-radius: 8px;
-  padding: 1.5rem;
-}
-
-.my-plants h2, .active-plants h2 {
-  color: #4caf50;
-}
-
-.my-plants li {
-  margin: 0.75rem 0;
-  padding: 0.5rem;
-  background: #ffffff;
-  border-left: 4px solid #e91e63;
-  position: relative;
-}
-
-.delete-btn {
-  background-color: #e53935;
-  color: white;
-  border: none;
-  border-radius: 4px;
-  padding: 0.4rem 0.8rem;
-  margin-top: 0.5rem;
-  cursor: pointer;
-  transition: background-color 0.3s;
-}
-
-.delete-btn:hover {
-  background-color: #c62828;
-}
-</style>
