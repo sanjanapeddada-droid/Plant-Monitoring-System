@@ -6,6 +6,7 @@ This project aims to monitor indoor plant conditions using smart sensors. The sy
 
 ###  Benefits:
 - Prevents over or under watering
+- Warns if the light exposure is too high or too low
 - Real time environmental feedback (humidity, temperature, light, water)
 - Easy to use GUI with historical data
 
@@ -15,6 +16,7 @@ This project aims to monitor indoor plant conditions using smart sensors. The sy
 
 ###  Hardware
 - **Wio Terminal**
+- **Accessories**
 - **Grove Sensors:**
   - DHT11 for temperature and humidity
   - Soil moisture sensor
@@ -48,6 +50,7 @@ This project aims to monitor indoor plant conditions using smart sensors. The sy
    - "PubSubClient"
    - "rpcWifi"
    - "DHT"
+   - "ArduinoJson"
 3. Upload code to Wio Terminal
 4. Ensure WiFi credentials and MQTT broker IP are correctly configured
 
