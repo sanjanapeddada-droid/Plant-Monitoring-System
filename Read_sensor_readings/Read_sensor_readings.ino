@@ -14,9 +14,7 @@ DHT dht(DHTPIN, DHTTYPE);
 int moisturePin = A0; 
 int waterPin = A6;
 
-const char* moistureTopic = "wio/moisture"; 
-const char* temperatureTopic = "wio/temperature";
-const char* humidityTopic = "wio/humidity";
+const char* topic = "wio/readings";
 
 void setup() {
   pinMode(WIO_LIGHT, INPUT);
@@ -37,7 +35,7 @@ void setup() {
   Serial.print("Connected to ");
   Serial.println(ssid);
   
-  client.setServer(mqtt_server, 1883);
+  client.setServer("mqtt_server", 1883);    
   
   delay(2000);
 }
@@ -56,52 +54,45 @@ void connectMQTT() {
 }
 
 void loop() {
+  
   if (!client.connected()) {
     connectMQTT();
   }
   client.loop(); 
-  
-  int moistureValue = analogRead(moisturePin);
+
+  // read moisture
+  int moistureValue = ((analogRead(moisturePin)/1023.0)*100.0);
   Serial.println(moistureValue);
 
-  int waterValue = analogRead(waterPin);
-  Serial.println(waterValue);
-
-  int lightValue = analogRead(WIO_LIGHT);
-  Serial.println(lightValue);
-
-    // read temperature
-  Serial.println("Reading temperature...");
+  // read temperature
   float temperatureC = dht.readTemperature();
   if (!isnan(temperatureC)) {
-    char tempPayload[10];
-    dtostrf(temperatureC, 1, 2, tempPayload);
-    client.publish(temperatureTopic, tempPayload);
-    Serial.print("Temperature: ");
-    Serial.println(tempPayload);
+    Serial.println(temperatureC);
   } else {
     Serial.println("Failed to read temperature from DHT!");
   }
 
+  // read light
+  int lightValue = ((analogRead(WIO_LIGHT)/1023.0)*100.0);
+  Serial.println(lightValue);
+
   // read humidity
-  Serial.println("Reading humidity...");
   float humidity = dht.readHumidity();
   if (!isnan(humidity)) {
-    char humidityPayload[10];
-    dtostrf(humidity, 1, 2, humidityPayload);
-    client.publish(humidityTopic, humidityPayload);
-    Serial.print("Humidity: ");
-    Serial.println(humidityPayload);
+    Serial.println(humidity);
   } else {
     Serial.println("Failed to read humidity from DHT!");
   }
-  
-  //char payload[10];                       // this line and the two under is from chatgpt. Explination: It takes a numeric sensor value (moistureValue), 
-                                          // turns it into a string, and sends it to an MQTT topic so other devices or apps can read it.
-  //sprintf(payload, "%d", moistureValue);
-  //client.publish(topic, payload);
+
+  // read waterlevel
+  int waterValue = ((analogRead(waterPin)/1023.0)*100.0);
+  Serial.println(waterValue);
+
+  // these lines under is from chatgpt. It takes the numeric sensor values, turns it into a string and sends it to an MQTT toppic so other devices can read it.
+  char payload[128];
+  snprintf(payload, sizeof(payload),"{\"moisture\":%d,\"temperature\":%.1f,\"light\":%d,\"humidity\":%.1f,\"water\":%d}", moistureValue, temperatureC, lightValue, humidity, waterValue);
+  client.publish(topic, payload);
 
   delay(30000); // Send every 30 seconds
 
 }
-
