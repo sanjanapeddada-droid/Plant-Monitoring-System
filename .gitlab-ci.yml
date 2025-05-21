@@ -4,7 +4,20 @@ stages:
   - install
   - test
   - build
+  - arduino-build
 
+variables:
+  ARDUINO_CLI_PATH: "/usr/local/bin/arduino-cli"
+  SKETCH_PATH: "Read_sensor_readings/Read_sensor_readings.ino"
+  FQBN: "Seeeduino:samd:seeed_wio_terminal"
+
+cache:
+  paths:
+    - .arduino15/
+
+#########################
+# Frontend/Backend Jobs #
+#########################
 
 backend:
   stage: install
@@ -33,3 +46,29 @@ frontend:
   artifacts:
     paths:
       - data/dist
+
+####################
+# Arduino Build Job #
+####################
+
+arduino-build:
+  image: debian:latest
+  stage: arduino-build
+  tags:
+    - docker
+  before_script:
+    - apt-get update -qq && apt-get install -y -qq wget xz-utils tar
+    - wget -q https://downloads.arduino.cc/arduino-cli/arduino-cli_latest_Linux_64bit.tar.gz
+    - tar -xf arduino-cli_latest_Linux_64bit.tar.gz
+    - mv arduino-cli "$ARDUINO_CLI_PATH"
+    - chmod +x "$ARDUINO_CLI_PATH"
+    - arduino-cli config add board_manager.additional_urls https://files.seeedstudio.com/arduino/package_seeeduino_boards_index.json
+    - arduino-cli core update-index
+    - arduino-cli core install Seeeduino:samd
+    - arduino-cli lib install "DHT sensor library"
+    - arduino-cli lib install "PubSubClient"
+    - arduino-cli lib install "Seeed Arduino rpcWiFi"
+    - arduino-cli lib install "Seeed Arduino rpcUnified"
+  script:
+    - ls -la Read_sensor_readings/
+    - "$ARDUINO_CLI_PATH" compile --fqbn "$FQBN" "$SKETCH_PATH"
