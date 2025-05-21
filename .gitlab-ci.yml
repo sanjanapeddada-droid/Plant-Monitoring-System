@@ -15,10 +15,6 @@ cache:
   paths:
     - .arduino15/
 
-#########################
-# Frontend/Backend Jobs #
-#########################
-
 backend:
   stage: install
   tags:
@@ -45,11 +41,7 @@ frontend:
     - npm run build
   artifacts:
     paths:
-      - data/dist
-
-####################
-# Arduino Build Job #
-####################
+    - data/dist
 
 arduino-build:
   image: debian:latest
