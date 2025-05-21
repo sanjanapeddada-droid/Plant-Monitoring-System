@@ -71,5 +71,4 @@ arduino-build:
     - arduino-cli lib install "Seeed Arduino rpcUnified"
   script:
     - ls -la Read_sensor_readings/
-     - "$ARDUINO_CLI_PATH" compile --fqbn "$FQBN" "$SKETCH_PATH"
-
+    - "$ARDUINO_CLI_PATH" compile --fqbn "$FQBN" "$SKETCH_PATH"
