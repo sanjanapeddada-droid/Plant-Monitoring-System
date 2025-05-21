@@ -25,11 +25,11 @@ This project aims to monitor indoor plant conditions using smart sensors. The sy
 - **Arduino (C++)** on Wio Terminal
 - **Mosquitto MQTT Broker** (running on local network)
 - **Vue.js Frontend** (displays live sensor data)
-- **MongoDB** (stores sensor history)
+- **MySQL** (stores sensor history)
 - **CI/CD pipeline** via GitLab for Arduino builds
 
 >  *Architecture Diagram:*  
-
+[![Architecture Diagram](https://git.chalmers.se/courses/dit113/2025/group-12/plant-monitoring-system/-/wikis/uploads/2f376b7f179247ee3e0079d3afb4c782/Screenshot_2025-04-10_at_17.05.45.png)](https://git.chalmers.se/courses/dit113/2025/group-12/plant-monitoring-system/-/wikis/uploads/2f376b7f179247ee3e0079d3afb4c782/Screenshot_2025-04-10_at_17.05.45.png)
 
 ---
 
