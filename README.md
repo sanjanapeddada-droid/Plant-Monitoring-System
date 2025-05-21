@@ -42,7 +42,7 @@ This project aims to monitor indoor plant conditions using smart sensors. The sy
 
 ---
 
-### 🔌 Arduino Setup
+###  Arduino Setup
 1. Open Arduino IDE
 2. Install libraries:
    - "PubSubClient"
