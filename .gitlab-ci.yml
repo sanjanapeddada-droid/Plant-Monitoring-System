@@ -62,5 +62,9 @@ arduino-build:
     - arduino-cli lib install "Seeed Arduino rpcWiFi"
     - arduino-cli lib install "Seeed Arduino rpcUnified"
   script:
+    - echo "Current directory structure:"
+    - ls -la
+    - echo "Checking sketch directory:"
     - ls -la Read_sensor_readings/
+    - echo "Compiling sketch:"
      - "$ARDUINO_CLI_PATH" compile --fqbn "$FQBN" "$SKETCH_PATH"
