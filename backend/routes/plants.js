@@ -48,23 +48,7 @@ router.get('/user/:id', async (req, res) => {
   }
 })
 
-// Add a plant to the user's personal list (requires authentication)
-router.post('/add', verifyToken, async (req, res) => {
-  const { plant_id } = req.body
-  const userId = req.userId // User ID from the token
 
-  try {
-    // Insert the plant into the user's personal plants list
-    const [result] = await pool.query(
-      'INSERT INTO user_plants (user_id, plant_type_id) VALUES (?, ?)',
-      [userId, plant_id]
-    )
-    res.status(201).json({ message: 'Plant added successfully' })
-  } catch (err) {
-    console.error('Error adding plant to user list:', err)
-    res.status(500).json({ message: 'Error adding plant to user list' })
-  }
-})
 // DELETE a user_plant by its record ID
 router.delete(
   '/user/:id',
@@ -90,7 +74,46 @@ router.delete(
   }
 )
 
+// Add a plant to the user's personal list (requires authentication)
+router.post('/add', verifyToken, async (req, res) => {
+  const { plant_id } = req.body
+  const userId = req.userId // User ID from the token
 
+  try {
+    // Insert the plant into the user's personal plants list
+    const [result] = await pool.query(
+      'INSERT INTO user_plants (user_id, plant_type_id) VALUES (?, ?)',
+      [userId, plant_id]
+    )
+    res.status(201).json({ message: 'Plant added successfully' })
+  } catch (err) {
+    console.error('Error adding plant to user list:', err)
+    res.status(500).json({ message: 'Error adding plant to user list' })
+  }
+})
+
+
+//  Activate or deactivate a plant
+router.put('/user/:id/activate', verifyToken, async (req, res) => {
+  const userPlantId = req.params.id
+  const { deactivate } = req.body
+  const isActive = deactivate ? 0 : 1
+
+ try {
+    // ✅ This should deactivate all the user's plants first
+    await pool.query('UPDATE user_plants SET is_active = 0 WHERE user_id = ?', [req.userId])
+
+    // ✅ Then activate the selected one, unless we are deactivating it
+    if (!deactivate) {
+      await pool.query('UPDATE user_plants SET is_active = 1 WHERE id = ?', [userPlantId])
+    }
+
+    res.sendStatus(200)
+  } catch (err) {
+    console.error('❌ Error updating activation:', err)
+    res.status(500).json({ message: 'Server error' })
+  }
+})
 
 // Frontend: sending the plant name
 async function onPlantSelected(plantName) {

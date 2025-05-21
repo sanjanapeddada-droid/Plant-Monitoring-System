@@ -52,15 +52,29 @@ mqttClient.on('connect', () => {
   mqttClient.subscribe('wio/moisture', (err) => {
     if (err) console.error('Subscription error:', err)
   })
+  mqttClient.subscribe('wio/temperature', (err) => {
+    if (err) console.error('Subscription error:', err)
+    })
+  mqttClient.subscribe('wio/humidity', (err) => {
+    if (err) console.error('Subscription error:', err)
+    })
 })
 
 mqttClient.on('message', (topic, message) => {
-  if (topic === 'wio/moisture') {
-    const moistureData = message.toString()
-    console.log(`Moisture Data Received: ${moistureData}`)
-
-    // Emit to all connected WebSocket clients
-    io.emit('moisture_update', { moisture: moistureData })
+  const payload = message.toString()
+  // decide the event name by topic
+  switch (topic) {
+    case 'wio/moisture':
+      io.emit('moisture_update',   { moisture: payload })
+      break
+    case 'wio/temperature':
+      io.emit('temperature_update',{ temperature: payload })
+      break
+    case 'wio/humidity':
+      io.emit('humidity_update',   { humidity: payload })
+      break
+    default:
+      console.warn('Unexpected topic:', topic)
   }
 })
 

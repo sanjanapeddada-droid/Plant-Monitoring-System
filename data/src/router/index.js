@@ -31,7 +31,13 @@ const routes = [
 },
 
 
-  { path: '/:pathMatch(.*)*', redirect: '/login' }
+  { path: '/:pathMatch(.*)*', redirect: '/login' },
+  {
+  path: '/menu/activesensors',
+  component: () => import('@/views/ActiveSensors.vue'),
+  meta: { requiresAuth: true }
+}
+
 ]
 
 const router = createRouter({

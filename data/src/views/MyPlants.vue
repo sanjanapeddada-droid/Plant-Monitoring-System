@@ -1,132 +1,188 @@
-<template>
-  <div class="plant-sections">
-    <!-- My Plants from DB -->
-    <div class="my-plants">
-      <h2>My Plants</h2>
-      <ul>
-        <li v-for="p in plants" :key="p.userPlantId">
-          {{ p.name }} — Moisture: {{ p.min_percentage }}–{{ p.max_percentage }}%
-          <br />
-          Needs: {{ p.light_requirement }}
-          <button class="delete-btn" @click="deletePlant(p.userPlantId)">
-            Delete
-          </button>
-        </li>
-      </ul>
-    </div>
+<script setup>
+import { ref, computed, onMounted } from 'vue'
+import axios from 'axios'
 
-    <!-- Active Plants from MQTT -->
-    <div class="active-plants">
-      <h2>Active Plants</h2>
-      <div v-if="activeMoisture !== null">
-        <strong>Live Moisture Reading:</strong> {{ activeMoisture }}
+const plants = ref([])
+const USER_ID = 1 // Replace with dynamic user ID if needed
+
+const activePlant = computed(() => {
+  return plants.value.find(p => p.is_active === 1) || null
+})
+
+const inactivePlants = computed(() => {
+  return plants.value.filter(p => p.is_active !== 1)
+})
+
+onMounted(async () => {
+  await fetchPlants()
+})
+
+const fetchPlants = async () => {
+  try {
+    const res = await axios.get(`http://localhost:3000/api/plants/user/${USER_ID}`)
+    plants.value = res.data.map(p => ({
+      ...p,
+      is_active: Number(p.is_active)
+    }))
+    console.log('🌿 Plant data updated:', plants.value)
+  } catch (err) {
+    console.error('❌ Error fetching user plants:', err)
+  }
+}
+
+const deletePlant = async (userPlantId) => {
+  try {
+    const token = localStorage.getItem('token')
+    await axios.delete(`http://localhost:3000/api/plants/user/${userPlantId}`, {
+      headers: { Authorization: `Bearer ${token}` }
+    })
+    plants.value = plants.value.filter(p => p.userPlantId !== userPlantId)
+  } catch (err) {
+    console.error('❌ Error deleting plant:', err)
+  }
+}
+
+const toggleActive = async (userPlantId) => {
+  try {
+    const token = localStorage.getItem('token')
+    if (!token) return console.error('No token found')
+
+    const selectedPlant = plants.value.find(p => p.userPlantId === userPlantId)
+    const isCurrentlyActive = selectedPlant?.is_active === 1
+
+    plants.value.forEach(p => {
+      p.is_active = isCurrentlyActive ? 0 : (p.userPlantId === userPlantId ? 1 : 0)
+    })
+
+    await axios.put(`http://localhost:3000/api/plants/user/${userPlantId}/activate`, {
+      deactivate: isCurrentlyActive
+    }, {
+      headers: { Authorization: `Bearer ${token}` }
+    })
+
+    console.log(isCurrentlyActive ? '✅ Deactivated!' : '✅ Activated!')
+  } catch (err) {
+    await fetchPlants()
+    console.error('❌ Error toggling plant:', err)
+  }
+}
+</script>
+
+<template>
+  <div class="main-content">
+    <h1>My Plants</h1>
+
+    <div class="plant-sections">
+      <!-- Active Plant -->
+      <div class="plant-box">
+        <h2>Active Plant</h2>
+        <div v-if="activePlant" class="plant-card active">
+          <strong>{{ activePlant.name }}</strong><br />
+          Moisture: {{ activePlant.min_percentage }}–{{ activePlant.max_percentage }}%<br />
+          Light: {{ activePlant.light_requirement }}
+          <div class="buttons">
+            <button class="delete-btn" @click="deletePlant(activePlant.userPlantId)">Delete</button>
+            <button class="deactivate-btn" @click="toggleActive(activePlant.userPlantId)">Deactivate</button>
+          </div>
+        </div>
+        <p v-else>No active plants yet.</p>
       </div>
-      <p v-else>No active sensor data received yet.</p>
+
+      <!-- Inactive Plants -->
+      <div class="plant-box">
+        <h2>Inactive Plants</h2>
+        <ul>
+          <li v-for="p in inactivePlants" :key="p.userPlantId" class="plant-card">
+            <strong>{{ p.name }}</strong><br />
+            Moisture: {{ p.min_percentage }}–{{ p.max_percentage }}%<br />
+            Needs: {{ p.light_requirement }}
+            <div class="buttons">
+              <button class="delete-btn" @click="deletePlant(p.userPlantId)">Delete</button>
+              <button class="activate-btn" @click="toggleActive(p.userPlantId)">Activate</button>
+            </div>
+          </li>
+        </ul>
+      </div>
     </div>
   </div>
 </template>
 
-<script setup>
-import { ref, onMounted } from 'vue'
-import mqtt           from 'mqtt'
-import axios          from 'axios'
-
-const plants         = ref([])
-const activeMoisture = ref(null)
-const USER_ID        = 1
-
-// — fetch DB plants
-const fetchPlants = async () => {
-  try {
-    const res = await axios.get(
-      `http://localhost:3000/api/plants/user/${USER_ID}`
-    )
-    plants.value = res.data
-  } catch (err) {
-    console.error('Error fetching user plants:', err)
-  }
-}
-
-// — delete a plant
-const deletePlant = async (id) => {
-  try {
-    const token = localStorage.getItem('token')
-    await axios.delete(
-      `http://localhost:3000/api/plants/user/${id}`,
-      { headers: { Authorization: `Bearer ${token}` } }
-    )
-    plants.value = plants.value.filter(p => p.userPlantId !== id)
-  } catch (err) {
-    console.error('Error deleting plant:', err)
-  }
-}
-
-// — subscribe via MQTT over WebSocket
-const setupMQTT = () => {
-  const client = mqtt.connect('ws://localhost:9001')  // → MQTT broker’s WS port
-
-  client.on('connect', () => {
-    console.log('☁️ MQTT over WS connected')
-    client.subscribe('wio/moisture')
-  })
-
-  client.on('message', (topic, msg) => {
-    if (topic === 'wio/moisture') {
-      activeMoisture.value = msg.toString()
-    }
-  })
-
-  client.on('error', err => {
-    console.error('MQTT error:', err)
-  })
-}
-
-onMounted(() => {
-  fetchPlants()    // △ load your DB plants
-  setupMQTT()      // △ start live sensor feed
-})
-</script>
-
 <style scoped>
+.main-content {
+  padding: 2rem;
+  width: 100%;
+}
+
+h1 {
+  font-size: 2rem;
+  color: #2e7d32;
+  margin-bottom: 1.5rem;
+}
+
 .plant-sections {
   display: flex;
-  gap: 2rem;
   flex-wrap: wrap;
+  gap: 2rem;
 }
 
-.my-plants, .active-plants {
+.plant-box {
   flex: 1;
   min-width: 300px;
-  background: #f0fff4;
-  border: 2px solid #e91e63;
+  background-color: #f9fffc;
+  border: 2px solid #b2dfdb;
+  padding: 1rem;
   border-radius: 8px;
-  padding: 1.5rem;
 }
 
-.my-plants h2, .active-plants h2 {
-  color: #4caf50;
+.plant-box h2 {
+  margin-bottom: 1rem;
+  color: #388e3c;
 }
 
-.my-plants li {
-  margin: 0.75rem 0;
-  padding: 0.5rem;
+.plant-card {
   background: #ffffff;
-  border-left: 4px solid #e91e63;
-  position: relative;
+  border-left: 4px solid #009688;
+  margin-bottom: 1rem;
+  padding: 0.75rem;
+  border-radius: 4px;
+}
+
+.plant-card.active {
+  border-left-color: #ff9800;
+}
+
+.buttons {
+  margin-top: 0.5rem;
+}
+
+button {
+  padding: 0.4rem 0.8rem;
+  border: none;
+  border-radius: 4px;
+  margin-right: 0.5rem;
+  color: white;
+  cursor: pointer;
 }
 
 .delete-btn {
-  background-color: #e53935;
-  color: white;
-  border: none;
-  border-radius: 4px;
-  padding: 0.4rem 0.8rem;
-  margin-top: 0.5rem;
-  cursor: pointer;
-  transition: background-color 0.3s;
+  background-color: #f44336;
+}
+.delete-btn:hover {
+  background-color: #d32f2f;
 }
 
-.delete-btn:hover {
-  background-color: #c62828;
+.activate-btn {
+  background-color: #4caf50;
+}
+.activate-btn:hover {
+  background-color: #388e3c;
+}
+
+.deactivate-btn {
+  background-color: #ff9800;
+}
+.deactivate-btn:hover {
+  background-color: #f57c00;
 }
 </style>
+
