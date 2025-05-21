@@ -35,7 +35,7 @@ void setup() {
   Serial.print("Connected to ");
   Serial.println(ssid);
   
-  client.setServer(mqtt_server, 1883);
+  client.setServer("mqtt_server", 1883);    
   
   delay(2000);
 }
@@ -54,13 +54,14 @@ void connectMQTT() {
 }
 
 void loop() {
+  
   if (!client.connected()) {
     connectMQTT();
   }
   client.loop(); 
 
   // read moisture
-  int moistureValue = analogRead(moisturePin);
+  int moistureValue = ((analogRead(moisturePin)/1023.0)*100.0);
   Serial.println(moistureValue);
 
   // read temperature
@@ -72,7 +73,7 @@ void loop() {
   }
 
   // read light
-  int lightValue = analogRead(WIO_LIGHT);
+  int lightValue = ((analogRead(WIO_LIGHT)/1023.0)*100.0);
   Serial.println(lightValue);
 
   // read humidity
@@ -84,7 +85,7 @@ void loop() {
   }
 
   // read waterlevel
-  int waterValue = analogRead(waterPin);
+  int waterValue = ((analogRead(waterPin)/1023.0)*100.0);
   Serial.println(waterValue);
 
   // these lines under is from chatgpt. It takes the numeric sensor values, turns it into a string and sends it to an MQTT toppic so other devices can read it.
@@ -95,4 +96,3 @@ void loop() {
   delay(30000); // Send every 30 seconds
 
 }
-
