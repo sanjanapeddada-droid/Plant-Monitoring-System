@@ -74,6 +74,23 @@ router.delete(
   }
 )
 
+// Add a plant to the user's personal list (requires authentication)
+router.post('/add', verifyToken, async (req, res) => {
+  const { plant_id } = req.body
+  const userId = req.userId // User ID from the token
+
+  try {
+    // Insert the plant into the user's personal plants list
+    const [result] = await pool.query(
+      'INSERT INTO user_plants (user_id, plant_type_id) VALUES (?, ?)',
+      [userId, plant_id]
+    )
+    res.status(201).json({ message: 'Plant added successfully' })
+  } catch (err) {
+    console.error('Error adding plant to user list:', err)
+    res.status(500).json({ message: 'Error adding plant to user list' })
+  }
+})
 
 
 //  Activate or deactivate a plant
