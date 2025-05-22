@@ -92,7 +92,7 @@ This project aims to monitor indoor plant conditions using smart sensors. The sy
 | **Artemis**   | MQTT setup, CI/CD pipeline, Arduino programming |
 | **Sanjana**   | Frontend development with Vue.js |
 | **Tyra**      | MySQL integration, data storage logic |
-| **Giovanna**  | Project coordination, development with Vue.js, video editing |
+| **Giovana**  | Project coordination, development with Vue.js, video editing, CI/CD pipeline|
 
 ---
 
