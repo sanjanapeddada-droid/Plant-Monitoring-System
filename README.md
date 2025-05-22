@@ -47,12 +47,21 @@ This project aims to monitor indoor plant conditions using smart sensors. The sy
 ###  Arduino Setup
 1. Open Arduino IDE
 2. Install libraries:
-   - "PubSubClient"
-   - "rpcWifi"
-   - "DHT"
-   - "ArduinoJson"
-3. Upload code to Wio Terminal
-4. Ensure WiFi credentials and MQTT broker IP are correctly configured
+    - Select Tools>Manage libraries 
+    - Search up and install:
+        "PubSubClient"
+        "rpcWifi"
+        "DHT"
+        “ArduinoJson"
+3. Include libraries:
+    - Skiss>Include Libraries
+    - Select:
+        "PubSubClient"
+        "rpcWifi"
+        "DHT"
+        “ArduinoJson"
+4. Upload code to Wio Terminal
+5. Ensure WiFi credentials and MQTT broker IP are correctly configured
 
 ---
 
