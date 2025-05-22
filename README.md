@@ -83,7 +83,7 @@ This project aims to monitor indoor plant conditions using smart sensors. The sy
 ---
 
 ###  Vue Frontend
-1. Navigate to the "Frontend/" folder
+1. Navigate to the "Data/" folder
 2. Run:
     ```bash
     npm install
