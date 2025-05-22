@@ -98,6 +98,8 @@ This project aims to monitor indoor plant conditions using smart sensors. The sy
 2. cd into the backend folder 
 3. type node server.js 
 if everything is set up correctly you will see a messege similar to:
+
+
 ![alt text](image.png)
 
 ---
