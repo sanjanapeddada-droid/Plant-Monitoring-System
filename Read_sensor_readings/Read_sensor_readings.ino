@@ -2,6 +2,7 @@
 #include <PubSubClient.h>
 #include <DHT.h>
 #include "wifi_config.h" //getting the wifi credentials
+#include <ArduinoJson.h>
 
 // DHT sensor settings
 #define DHTPIN D2          // use D2 (Grove digital port)
@@ -15,6 +16,8 @@ int moisturePin = A0;
 int waterPin = A6;
 
 const char* topic = "wio/readings";
+
+unsigned long lastSent = 0;  // Track last publish time
 
 void setup() {
   pinMode(WIO_LIGHT, INPUT);
@@ -35,7 +38,7 @@ void setup() {
   Serial.print("Connected to ");
   Serial.println(ssid);
   
-  client.setServer("mqtt_server", 1883);    
+  client.setServer(mqtt_server, 1883);    
   
   delay(2000);
 }
@@ -59,40 +62,39 @@ void loop() {
     connectMQTT();
   }
   client.loop(); 
+  
+  StaticJsonDocument<256> doc;
 
-  // read moisture
-  int moistureValue = ((analogRead(moisturePin)/1023.0)*100.0);
-  Serial.println(moistureValue);
+  if (millis() - lastSent > 30000) {   //the interval is 30 seconds
+    // read moisture
+    int moistureValue = ((analogRead(moisturePin)/1023.0)*100.0);
+    Serial.println(moistureValue);
+    doc["moisture"] = moistureValue;
 
-  // read temperature
-  float temperatureC = dht.readTemperature();
-  if (!isnan(temperatureC)) {
-    Serial.println(temperatureC);
-  } else {
-    Serial.println("Failed to read temperature from DHT!");
+    // read temperature
+    float temperatureValue = dht.readTemperature();
+    Serial.println(temperatureValue);
+    doc["temperature"] = temperatureValue;
+    
+    // read light
+    int lightValue = ((analogRead(WIO_LIGHT)/1023.0)*100.0);
+    Serial.println(lightValue);
+    doc["light"] = lightValue;
+  
+    // read humidity
+    float humidityValue = dht.readHumidity();
+    Serial.println(humidityValue);
+    doc["humidity"] = humidityValue;
+  
+    // read waterlevel
+    int waterValue = ((analogRead(waterPin)/1023.0)*100.0);
+    Serial.println(waterValue);
+    doc["water"] = waterValue;
+    
+    // these lines under is from chatgpt. It takes the numeric sensor values, converts into a JSON string and sends it to an MQTT toppic so other devices can read it.
+    char jsonBuffer[256];
+    serializeJson(doc, jsonBuffer);
+    client.publish(topic, jsonBuffer);
+    lastSent = millis();
   }
-
-  // read light
-  int lightValue = ((analogRead(WIO_LIGHT)/1023.0)*100.0);
-  Serial.println(lightValue);
-
-  // read humidity
-  float humidity = dht.readHumidity();
-  if (!isnan(humidity)) {
-    Serial.println(humidity);
-  } else {
-    Serial.println("Failed to read humidity from DHT!");
-  }
-
-  // read waterlevel
-  int waterValue = ((analogRead(waterPin)/1023.0)*100.0);
-  Serial.println(waterValue);
-
-  // these lines under is from chatgpt. It takes the numeric sensor values, turns it into a string and sends it to an MQTT toppic so other devices can read it.
-  char payload[128];
-  snprintf(payload, sizeof(payload),"{\"moisture\":%d,\"temperature\":%.1f,\"light\":%d,\"humidity\":%.1f,\"water\":%d}", moistureValue, temperatureC, lightValue, humidity, waterValue);
-  client.publish(topic, payload);
-
-  delay(30000); // Send every 30 seconds
-
 }
