@@ -65,14 +65,46 @@ This project aims to monitor indoor plant conditions using smart sensors. The sy
 
 ---
 
+### Database (mySQL)
+
+1. Install mySQL: https://dev.mysql.com/downloads/installer/
+
+2. In terminal type: mysql -u root -p.
+3. When prompted to enter a password, simply press enter.
+4. type CREATE DATABASE plantdb;
+5. USE plantdb;
+6. Now we need to connect to the rest of the code.
+7. Start by finding the path to plantdb.sql in the repo.
+8. Type: SOURCE C:your/path;
+
+---
+
+
+### Node modules
+1. cd into project root.
+2. type: npm install socket.io
+3. cd into the data folder. 
+4. type: npm install socket.io
+5. type: npm install socket.io-client
+6. cd into backend folder. 
+7. type: npm install socket.io
+8. cd into dataComparison
+9. type: npm install socket.io  
+
+---
+
 ###  MQTT Broker (Mosquitto)
 1. Edit "Mosquitto conf" to enable WebSocket:
     ```bash
+    allow_anonymous true
+
     listener 1883
     protocol mqtt
+   
 
     listener 9001
     protocol websockets
+
     ```
 2. Run:
 
@@ -102,34 +134,7 @@ if everything is set up correctly you will see a messege similar to:
 
 ![alt text](image.png)
 
----
 
-### Database (mySQL)
-
-1. Install mySQL: https://dev.mysql.com/downloads/installer/
-
-2. In terminal type: mysql -u root -p.
-3. When prompted to enter a password, simply press enter.
-4. type CREATE DATABASE plantdb;
-5. USE plantdb;
-6. Now we need to connect to the rest of the code.
-7. Start by finding the path to plantdb.sql in the repo.
-8. Type: SOURCE C:your/path;
-
----
-
-### Node modules
-1. cd into project root.
-2. type: npm install socket.io
-3. cd into the data folder. 
-4. type: npm install socket.io
-5. type: npm install socket.io-client
-6. cd into backend folder. 
-7. type: npm install socket.io
-8. cd into dataComparison
-9. type: npm install socket.io  
-
----
 
 ### Repository structure 
 
