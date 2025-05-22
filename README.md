@@ -16,7 +16,7 @@ This project aims to monitor indoor plant conditions using smart sensors. The sy
 
 ###  Hardware
 - **Wio Terminal**
-- **Accessories**
+- **Wio Terminal Battery Chassis**
 - **Grove Sensors:**
   - DHT11 for temperature and humidity
   - Soil moisture sensor
