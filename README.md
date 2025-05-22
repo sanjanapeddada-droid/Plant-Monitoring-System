@@ -119,7 +119,15 @@ if everything is set up correctly you will see a messege similar to:
 ---
 
 ### Node modules
-1. 
+1. cd into project root.
+2. type: npm install socket.io
+3. cd into the data folder. 
+4. type: npm install socket.io
+5. type: npm install socket.io-client
+6. cd into backend folder. 
+7. type: npm install socket.io
+8. cd into dataComparison
+9. type: npm install socket.io  
 
 ---
 
