@@ -91,11 +91,7 @@ void loop() {
     Serial.println(waterValue);
     doc["water"] = waterValue;
     
-    // these lines under is from chatgpt. It takes the numeric sensor values, turns it into a string and sends it to an MQTT toppic so other devices can read it.
-    //char payload[128];
-    //snprintf(payload, sizeof(payload),"{\"moisture\":%d,\"temperature\":%.1f,\"light\":%d,\"humidity\":%.1f,\"water\":%d}", moistureValue, temperatureC, lightValue, humidity, waterValue);
-    //client.publish(topic, payload);
-
+    // these lines under is from chatgpt. It takes the numeric sensor values, converts into a JSON string and sends it to an MQTT toppic so other devices can read it.
     char jsonBuffer[256];
     serializeJson(doc, jsonBuffer);
     client.publish(topic, jsonBuffer);
