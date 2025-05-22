@@ -82,6 +82,19 @@ This project aims to monitor indoor plant conditions using smart sensors. The sy
     ```
 3. The Vue app will connect to MQTT over WebSocket
 
+
+### Database (mySQL)
+
+1. Install mySQL: https://dev.mysql.com/downloads/installer/
+
+2. In terminal type: mysql -u root -p.
+3. When prompted to enter a password, simply press enter.
+4. type CREATE DATABASE plantdb;
+5. USE plantdb;
+6. Now we need to connect to the rest of the code.
+7. Start by finding the path to plantdb.sql in the repo.
+8. Type: SOURCE C:your/path;
+
 ---
 
 ##  Team Contributions
