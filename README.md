@@ -40,7 +40,7 @@ This project aims to monitor indoor plant conditions using smart sensors. The sy
 ###  Requirements
 - Arduino IDE with **PubSubClient** and **DHT** libraries
 - Docker + Mosquitto (with WebSocket configured)
-- Node.js + Vue CLI
+- Node.js + Vue CLI 
 
 ---
 
@@ -91,6 +91,16 @@ This project aims to monitor indoor plant conditions using smart sensors. The sy
     ```
 3. The Vue app will connect to MQTT over WebSocket
 
+---
+
+### Server 
+1. Open a terminal 
+2. cd into the backend folder 
+3. type node server.js 
+if everything is set up correctly you will see a messege similar to:
+![alt text](image.png)
+
+---
 
 ### Database (mySQL)
 
@@ -106,6 +116,15 @@ This project aims to monitor indoor plant conditions using smart sensors. The sy
 
 ---
 
+### Node modules
+1. 
+
+---
+
+### Repository structure 
+
+- to be done 
+
 ##  Team Contributions
 
 | Name      | Contribution |
@@ -113,7 +132,7 @@ This project aims to monitor indoor plant conditions using smart sensors. The sy
 | **Tilly**     | Arduino programming, sensor integration, documentation |
 | **Artemis**   | MQTT setup, CI/CD pipeline, Arduino programming |
 | **Sanjana**   | Frontend development with Vue.js |
-| **Tyra**      | MySQL integration, data storage logic |
+| **Tyra**      | MySQL integration, data storage logic, frontend development focused on integration with the database|
 | **Giovanna**  | Project coordination, development with Vue.js, video editing |
 
 ---
