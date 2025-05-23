@@ -143,7 +143,7 @@ If everything is set up correctly you will see a message similar to:
 
 ### Repository structure 
 
-![alt text](image-3.png)
+![alt text](image-4.png)
 
 Folders:
 - backend: code that connects MQTT and the database with the frontend
