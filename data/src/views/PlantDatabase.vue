@@ -1,5 +1,3 @@
-
-
 <template>
   <div class="plant-database">
     <h2>Search Plant Database</h2>
@@ -25,6 +23,8 @@
 import { ref, onMounted, computed } from 'vue'
 import axios from 'axios'
 import { auth } from '../stores/auth'
+import { useSelectedPlant } from '../stores/selectedPlant'
+const selectedPlantStore = useSelectedPlant()
 
 const plants = ref([])
 const search = ref('')
@@ -49,7 +49,6 @@ const filteredPlants = computed(() => {
 
 // Function to add plant to user's personal list
 async function addPlant(plant) {
-  // ← Add your debug here
   console.log('Adding plant, token=', auth.token)
 
   if (!auth.token) {
@@ -58,17 +57,28 @@ async function addPlant(plant) {
   }
 
   try {
+    // 1. Add to user's list
     await axios.post(
       'http://localhost:3000/api/plants/add',
-      { plant_id: plant.id },
+      { plantName: plant.name },
       { headers: { Authorization: `Bearer ${auth.token}` } }
     )
-    alert(`${plant.name} has been added to your plants!`)
+
+    // 2. Select plant for monitoring
+    await axios.post('http://localhost:3000/api/select-plant', {
+      plantName: plant.name
+    })
+
+    // 3. Save selection globally
+    selectedPlantStore.selectPlant(plant.id, plant.name)
+
+    alert(`${plant.name} has been added!`)
   } catch (err) {
-    console.error('Error adding plant:', err)
-    alert('Could not add plant. Are you logged in?')
+    console.error('Error adding/selecting plant:', err)
+    alert('Something went wrong.')
   }
-}</script>
+}
+</script>
 
 
 <style scoped>
@@ -102,7 +112,7 @@ li {
 }
 
 .add-button {
-  background-color: #4caf50;
+  background-color: #228B22;
   color: white;
   padding: 0.4rem 1rem;
   border: none;
@@ -112,6 +122,6 @@ li {
 }
 
 .add-button:hover {
-  background-color: #388e3c;
+  background-color: #228B22;
 }
 </style>

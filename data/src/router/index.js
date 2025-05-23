@@ -1,4 +1,5 @@
 import { createRouter, createWebHistory } from 'vue-router'
+
 import Dashboard     from '../views/Dashboard.vue'
 import SignUp        from '../views/SignUp.vue'
 import Login         from '../views/Login.vue'
@@ -15,29 +16,26 @@ const routes = [
   { path: '/signup', component: SignUp, meta: { guest: true } },
   { path: '/login',  component: Login,  meta: { guest: true } },
 
-  
-  { path: '/menu', component: Menu, meta: { requiresAuth: true }, 
+  {
+    path: '/menu',
+    component: Menu,
+    meta: { requiresAuth: true },
     children: [
       { path: 'myplants',      component: MyPlants },
       { path: 'activesensors', component: ActiveSensors },
-      { path: 'plantdatabase', name: PlantDatabase ,component: PlantDatabase }
+      { path: 'plantdatabase', component: PlantDatabase }
     ]
   },
+
   {
-  path: '/account/delete',
-  name: 'DeleteAccount',
-  component: DeleteAccount, 
-  meta: { requiresAuth: true }
-},
+    path: '/account/delete',
+    name: 'DeleteAccount',
+    component: DeleteAccount,
+    meta: { requiresAuth: true }
+  },
 
-
-  { path: '/:pathMatch(.*)*', redirect: '/login' },
-  {
-  path: '/menu/activesensors',
-  component: () => import('@/views/ActiveSensors.vue'),
-  meta: { requiresAuth: true }
-}
-
+  // catch all unknown routes and redirect to login
+  { path: '/:pathMatch(.*)*', redirect: '/login' }
 ]
 
 const router = createRouter({
@@ -46,15 +44,16 @@ const router = createRouter({
 })
 
 router.beforeEach((to, from, next) => {
-  const isLoggedIn = !!localStorage.getItem('token') //log in validation
+  const isLoggedIn = !!localStorage.getItem('token') // simple login check
 
   if (to.meta.requiresAuth && !isLoggedIn) {
     return next('/login')
   }
-  if ((to.meta.guest) && isLoggedIn) {
+  if (to.meta.guest && isLoggedIn) {
     return next('/menu/myplants')
   }
   next()
 })
 
 export default router
+

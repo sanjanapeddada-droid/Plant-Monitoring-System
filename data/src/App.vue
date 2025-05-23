@@ -1,9 +1,11 @@
 <template>
   <div id="app">
     <Notification
-  v-if="notification"
-  :type="notification.type"
-  :message="notification.message"/>
+      v-if="notification"
+      :type="notification.type"
+      :message="notification.message"
+      @close="notification = null"
+    />
 
     <aside class="sidebar">
       <h1 class="title">Plant Monitoring</h1>
@@ -16,7 +18,7 @@
           <li v-if="!isLoggedIn">
             <router-link to="/login">Log In</router-link>
           </li>
-          
+
           <!-- Show "Sign Out" if the user is logged in -->
           <li v-if="isLoggedIn">
             <button @click="signOut">Sign Out</button>
@@ -35,12 +37,15 @@
           <li v-if="isLoggedIn">
             <router-link to="/menu/plantdatabase">Plant Database</router-link>
           </li>
+
+          <!-- Delete Account link, only when logged in -->
           <li v-if="isLoggedIn">
             <router-link to="/account/delete">Delete Account</router-link>
           </li>
         </ul>
       </nav>
     </aside>
+
     <main class="content">
       <router-view />
     </main>
@@ -49,38 +54,75 @@
 
 
 
+
 <script setup>
-import { ref, computed, onMounted } from 'vue'
+import { ref, onMounted, computed, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import { auth } from './stores/auth'
 import socket from './utils/socket'
 import Notification from './views/Notification.vue'
+import { useSelectedPlant } from './stores/selectedPlant'
+import axios from 'axios'
 
-// Access the router
 const router = useRouter()
-
-// Computed property to check if the user is logged in
 const isLoggedIn = computed(() => auth.isLoggedIn)
+const notification = ref(null)
+const selectedPlantStore = useSelectedPlant()
 
-// Logout function
+const setupSocketListeners = () => {
+  socket.on('notification', (data) => {
+    notification.value = data
+    setTimeout(() => (notification.value = null), 5000)
+  })
+
+  socket.on('moisture_alert', (data) => {
+    notification.value = {
+      type: ['warning', 'danger'].includes(data.type) ? 'warning' : 'success',
+      message: data.message
+    }
+    setTimeout(() => (notification.value = null), 30000)
+  })
+  
+  socket.on('connect_error', (err) => {
+    console.error('Socket connection error:', err)
+  })
+}
+
+
+
+// Reactively join a socket room when the plant changes
+watch(
+  () => selectedPlantStore.selectedPlantId,
+  (newPlantID) => {
+    if (newPlantID) {
+      socket.emit('join_plant_room', newPlantID)
+      console.log('Joined plant room: plant_${newPlantID}')
+    }
+  },
+  { immediate: true }
+)
+
 function signOut() {
   auth.logout()
   router.push('/login')
 }
 
-// Notification state
-const notification = ref(null)
+onMounted(async () => {
+  setupSocketListeners()
+  selectedPlantStore.loadStoredPlant()
 
-// Listen for notifications from backend
-onMounted(() => {
-  socket.on('notification', (data) => {
-    notification.value = data
-    setTimeout(() => {
-      notification.value = null
-    }, 5000) // Hide after 5 seconds
-  })
+  if (selectedPlantStore.selectedPlantName) {
+    try {
+      await axios.post('http://localhost:3000/api/select-plant', {
+        plantName: selectedPlantStore.selectedPlantName
+      })
+    } catch (err) {
+      console.error('Failed to reselect plant:', err)
+    }
+  }
 })
 </script>
+
 
 
 <style>
@@ -91,7 +133,7 @@ onMounted(() => {
 
 .sidebar {
   width: 220px;
-  background: #5db09e;
+  background: #5db09e;;
   padding: 1rem;
 }
 

@@ -1,72 +1,41 @@
 <template>
-  <div class="active-sensors">
-    <h2>Live Sensor Readings</h2>
-
-    <div v-if="sensorData">
+    <div class="active-sensors">
+      <h2>Active Sensors</h2>
       <ul>
-        <li><strong>Moisture:</strong> {{ sensorData.moisture }}</li>
-        <li><strong>Temperature:</strong> {{ sensorData.temperature }} °C</li>
-        <li><strong>Light:</strong> {{ sensorData.light }} lux</li>
-        <li><strong>Humidity:</strong> {{ sensorData.humidity }} %</li>
-        <li><strong>Water:</strong> {{ sensorData.water }} mL</li>
+        <li v-for="sensor in sensors" :key="sensor.id">
+          {{ sensor.name }} – Status: {{ sensor.status }}, Value: {{ sensor.value }}
+        </li>
       </ul>
     </div>
-
-    <p v-else>No data received yet from sensors.</p>
-  </div>
-</template>
-
-<script setup>
-import { ref, onMounted } from 'vue'
-import mqtt from 'mqtt'
-
-const sensorData = ref(null)
-
-const setupMQTT = () => {
-  const client = mqtt.connect('ws://192.168.6.117:9001') // 🛠 replace with your IP
-
-  client.on('connect', () => {
-    console.log('☁️ MQTT connected')
-    client.subscribe('wio/readings')
-  })
-
-  client.on('message', (topic, message) => {
-    if (topic === 'wio/readings') {
-      try {
-        const payload = JSON.parse(message.toString())
-        sensorData.value = payload
-      } catch (err) {
-        console.error('Failed to parse MQTT message:', err)
-      }
-    }
-  })
-
-  client.on('error', err => {
-    console.error('MQTT error:', err)
-  })
-}
-
-onMounted(() => {
-  setupMQTT()
-})
-</script>
-
-<style scoped>
-.active-sensors {
-  max-width: 500px;
-  margin: auto;
-  background: #f8fff8;
-  border: 2px solid #4caf50;
-  padding: 1.5rem;
-  border-radius: 10px;
-}
-
-ul {
-  list-style-type: none;
-  padding: 0;
-}
-
-li {
-  margin-bottom: 0.5rem;
-}
-</style>
+  </template>
+  
+  <script setup>
+  import { ref } from 'vue'
+  
+  const sensors = ref([
+    { id: 1, name: 'Soil Moisture Sensor', status: 'Active' },
+    { id: 2, name: 'Temperature Sensor', status: 'Active'},
+    { id: 3, name: 'Light Sensor', status: 'Active' },
+    { id: 4, name: 'Water Level Sensor', status: 'Active'},
+    { id: 5, name:  'Humidity Sensor', status: 'Active'},
+  ])
+  </script>
+  
+  <style scoped>
+  .active-sensors {
+    text-align: center;
+    padding: 2rem;
+  }
+  .active-sensors h2 {
+    margin-bottom: 1rem;
+    color: #228B22;
+  }
+  .active-sensors ul {
+    list-style: none;
+    padding: 0;
+  }
+  .active-sensors li {
+    margin: 0.5rem 0;
+    font-size: 1.1rem;
+  }
+  </style>
