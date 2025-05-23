@@ -54,8 +54,8 @@ This project aims to monitor plant conditions using smart sensors. The system co
         "DHT"
         “ArduinoJson"
 3. Include libraries:
-    - Skiss>Include Libraries
-    - Select:
+    - Manage Libraries>Include Libraries
+    - Search and select:
         "PubSubClient"
         "rpcWifi"
         "DHT"
