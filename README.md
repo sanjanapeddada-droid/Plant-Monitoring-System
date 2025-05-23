@@ -139,6 +139,7 @@ if everything is set up correctly you will see a messege similar to:
 ### Repository structure 
 
 ![alt text](image-3.png)
+
 folders:
 - backend: code that connects MQTT and database with the rest of the code
 - data: code for the frontend part of our system 
