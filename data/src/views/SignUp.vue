@@ -72,7 +72,6 @@
   .form-group { margin-bottom: 1rem; }
   label { display: block; margin-bottom: .5rem; }
   input { width: 100%; padding: .5rem; }
-  button { background: #00d950; color: white; padding: .75rem; width: 100%; border: none; }
-  .error { color: #d84363; margin-top: .5rem; }
+  button { background: #228B22; color: white; padding: .75rem; width: 100%; border: none; }
+  .error { color: #C71585; margin-top: .5rem; }
   </style>
-  

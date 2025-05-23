@@ -22,7 +22,7 @@
 }
 
 .myPlants h2, .activeSensors h2 {
-  color: #00d950;
+  color: #228B22;
 }
 </style>
 
@@ -42,7 +42,7 @@
 
 .activeSensors h2 {
   font-size: 1.5rem;
-  color: #00d98d;
+  color: #228B22;
   margin-bottom: 1rem;
 }
 

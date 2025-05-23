@@ -23,13 +23,7 @@ backend:
     - cd backend
     - npm install
 
-backend-tests:
-  stage: test
-  tags:
-    - docker
-  script:
-    - cd backend
-    - echo "No tests yet"
+
 
 frontend:
   stage: build

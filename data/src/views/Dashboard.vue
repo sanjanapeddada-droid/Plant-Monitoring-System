@@ -1,6 +1,6 @@
 <template>
   <div class="dashboard">
-    <h1>plant monitoring system</h1>
+    <h1>Plant Monitoring System</h1>
 
     
     <section class="section">
@@ -50,7 +50,7 @@
 
 .section {
   margin-bottom: 2rem;
-  color: #8ef6a4;
+  color: #228B22;
 }
 
 h1 {
@@ -59,14 +59,14 @@ h1 {
 }
 
 h2 {
-  color: #8ef6a4;
+  color: #228B22;
   margin-bottom: 1rem;
 }
 
 p {
   line-height: 1.6;
-  font-size: 0.7rem;
-  color: #e1a6be;
+  font-size: 0.9rem;
+  color: #C71585;
 }
 
 ul {
