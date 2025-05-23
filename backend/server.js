@@ -46,7 +46,7 @@ app.use('/api/plants', plantsRoutes)
 app.use('/api/select-plant', selectPlantRoute)
 
 // MQTT client
-const mqttClient = mqtt.connect('ws://192.168.1.244:9001', {
+const mqttClient = mqtt.connect('ws://192.168.0.192:9001', {
   clientId: `node_server_${Math.random().toString(16).substr(2, 8)}`,
   clean: true,
   reconnectPeriod: 5000
