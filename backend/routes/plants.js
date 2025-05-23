@@ -48,31 +48,196 @@ router.get('/user/:id', async (req, res) => {
   }
 })
 
+// Get latest moisture reading for a user plant
+router.get('/moisture/:userPlantId', verifyToken, async (req, res) => {
+  const { userPlantId } = req.params;
+  const userId = req.userId;
+
+  try {
+    const [rows] = await pool.query(
+      `SELECT moisture, recorded_at AS timestamp
+      FROM plant_sensor_data
+      WHERE user_plant_id = ?
+      ORDER BY recorded_at DESC
+        LIMIT 1`,
+      [userPlantId]
+    );
+
+    if (rows.length === 0) {
+      return res.status(404).json({ message: 'No moisture data found' });
+    }
+
+    res.json(rows[0]);
+  } catch (err) {
+    console.error('Error fetching moisture data:', err);
+    res.status(500).json({ message: 'Error fetching moisture data' });
+  }
+});
+
+router.get('/temperature/:userPlantId', verifyToken, async (req, res) => {
+  const { userPlantId } = req.params;
+  const userId = req.userId;
+
+  try {
+    const [rows] = await pool.query(
+      `SELECT temperature, recorded_at AS timestamp
+       FROM plant_sensor_data
+       WHERE user_plant_id = ?
+         AND temperature IS NOT NULL
+       ORDER BY recorded_at DESC
+       LIMIT 1`,
+      [userPlantId]
+    );
+
+    if (rows.length === 0) {
+      return res.status(404).json({ message: 'No temperature data found' });
+    }
+
+    res.json(rows[0]);
+  } catch (err) {
+    console.error('Error fetching temperature data:', err);
+    res.status(500).json({ message: 'Error fetching temperature data' });
+  }
+});
+
+router.get('/light/:userPlantId', verifyToken, async (req, res) => {
+  const { userPlantId } = req.params;
+  const userId = req.userId;
+
+  try {
+    const [rows] = await pool.query(
+      `SELECT light_level AS light, recorded_at AS timestamp
+       FROM plant_sensor_data
+       WHERE user_plant_id = ?
+         AND light_level IS NOT NULL
+       ORDER BY recorded_at DESC
+       LIMIT 1`,
+      [userPlantId]
+    );
+
+    if (rows.length === 0) {
+      return res.status(404).json({ message: 'No light data found' });
+    }
+
+    res.json(rows[0]);
+  } catch (err) {
+    console.error('Error fetching light data:', err);
+    res.status(500).json({ message: 'Error fetching light data' });
+  }
+});
+
+router.get('/humidity/:userPlantId', verifyToken, async (req, res) => {
+  const { userPlantId } = req.params;
+  const userId = req.userId;
+
+  try {
+    const [rows] = await pool.query(
+      `SELECT humidity, recorded_at AS timestamp
+       FROM plant_sensor_data
+       WHERE user_plant_id = ?
+         AND humidity IS NOT NULL
+       ORDER BY recorded_at DESC
+       LIMIT 1`,
+      [userPlantId]
+    );
+
+    if (rows.length === 0) {
+      return res.status(404).json({ message: 'No humidity data found' });
+    }
+
+    res.json(rows[0]);
+  } catch (err) {
+    console.error('Error fetching humidity data:', err);
+    res.status(500).json({ message: 'Error fetching humidity data' });
+  }
+});
+
+router.get('/water-level/:userPlantId', verifyToken, async (req, res) => {
+  const { userPlantId } = req.params;
+  const userId = req.userId;
+
+  try {
+    const [rows] = await pool.query(
+      `SELECT water_level, recorded_at AS timestamp
+       FROM plant_sensor_data
+       WHERE user_plant_id = ?
+         AND water_level IS NOT NULL
+       ORDER BY recorded_at DESC
+       LIMIT 1`,
+      [userPlantId]
+    );
+
+    if (rows.length === 0) {
+      return res.status(404).json({ message: 'No water level data found' });
+    }
+
+    res.json(rows[0]);
+  } catch (err) {
+    console.error('Error fetching water level data:', err);
+    res.status(500).json({ message: 'Error fetching water level data' });
+  }
+});
+
+
+// Add a plant to the user's personal list (requires authentication)
+router.post('/add', verifyToken, async (req, res) => {
+  const { plantName } = req.body; // get plantName from frontend
+  const userId = req.userId; // from token
+
+  try {
+    // 1. Find plant profile info by name
+    const [plantRows] = await pool.query(
+      `SELECT id, min_sensor_output, max_sensor_output FROM plant_profiles WHERE name = ?`,
+      [plantName]
+    );
+
+    if (plantRows.length === 0) {
+      return res.status(404).json({ message: 'Plant not found' });
+    }
+
+    const plant = plantRows[0];
+
+    // 2. Insert into user_plants using plant info
+    await pool.query(
+      `INSERT INTO user_plants (user_id, plant_type_id, min_sensor_output, max_sensor_output)
+       VALUES (?, ?, ?, ?)`,
+      [userId, plant.id, plant.min_sensor_output, plant.max_sensor_output]
+    );
+
+    res.status(201).json({ message: 'Plant added successfully' });
+  } catch (err) {
+    console.error('Error adding plant to user list:', err);
+    res.status(500).json({ message: 'Error adding plant to user list' });
+  }
+});
 
 // DELETE a user_plant by its record ID
-router.delete(
-  '/user/:id',
-  verifyToken,               
-  async (req, res) => {
-    const userPlantId = req.params.id
-    const userId      = req.userId   
-     console.log(`DELETE /api/plants/user/${userPlantId} called by user ${userId}`)
+router.delete('/user/:id', verifyToken, async (req, res) => {
+  const userPlantId = req.params.id;
+  const userId = req.userId;
+  console.log(`DELETE /api/plants/user/${userPlantId} called by user ${userId}`);
 
-    try {
-      const [result] = await pool.query(
-        'DELETE FROM user_plants WHERE id = ? AND user_id = ?',
-        [userPlantId, userId]
-      )
-      if (result.affectedRows === 0) {
-        return res.status(404).json({ message: 'Plant not found' })
-      }
-      res.json({ message: 'Plant deleted successfully' })
-    } catch (err) {
-      console.error('Error deleting user plant:', err)
-      res.status(500).json({ message: 'Error deleting plant' })
+  try {
+    // 1. Delete all sensor data related to this plant
+    await pool.query('DELETE FROM plant_sensor_data WHERE user_plant_id = ?', [userPlantId]);
+
+    // 2. Now delete the user_plant entry
+    const [result] = await pool.query(
+      'DELETE FROM user_plants WHERE id = ? AND user_id = ?',
+      [userPlantId, userId]
+    );
+
+    if (result.affectedRows === 0) {
+      return res.status(404).json({ message: 'Plant not found' });
     }
+
+    res.json({ message: 'Plant deleted successfully' });
+  } catch (err) {
+    console.error('Error deleting user plant:', err);
+    res.status(500).json({ message: 'Error deleting plant' });
   }
-)
+});
+
 
 // Add a plant to the user's personal list (requires authentication)
 router.post('/add', verifyToken, async (req, res) => {

@@ -85,7 +85,7 @@ input {
 }
 
 button {
-  background: #00d950;
+  background: #228B22;
   color: white;
   padding: 0.75rem;
   width: 100%;
@@ -93,7 +93,7 @@ button {
 }
 
 .error {
-  color: #d84363;
+  color: #C71585;
   margin-top: 0.5rem;
 }
 </style>
