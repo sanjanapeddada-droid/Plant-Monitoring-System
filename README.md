@@ -159,5 +159,11 @@ Folders:
 | **Tyra**      | MySQL integration, data storage logic, frontend development focused on integration with the database|
 | **Giovanna**  | Project coordination, development with Vue.js, video editing |
 
+##  Link to demo:
+
+
+[Demo for plant monitoring system](https://youtu.be/WSujGwdSVv8)
+
+
 ---
 
