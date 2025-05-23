@@ -138,7 +138,12 @@ if everything is set up correctly you will see a messege similar to:
 
 ### Repository structure 
 
-- to be done 
+![alt text](image-2.png)
+
+folders:
+- backend: code that connects MQTT and database with the rest of the code
+- data: code for the frontend part of our system 
+- dataComparsion: code for comparing the incoming sensor data to the set thresholds. 
 
 ##  Team Contributions
 
