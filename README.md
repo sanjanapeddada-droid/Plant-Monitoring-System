@@ -31,7 +31,7 @@ This project aims to monitor plant conditions using smart sensors. The system co
 - **CI/CD pipeline** via GitLab for Arduino builds
 
 >  *Architecture Diagram:*  
-[![Architecture Diagram](https://git.chalmers.se/courses/dit113/2025/group-12/plant-monitoring-system/-/wikis/uploads/2f376b7f179247ee3e0079d3afb4c782/Screenshot_2025-04-10_at_17.05.45.png)](https://git.chalmers.se/courses/dit113/2025/group-12/plant-monitoring-system/-/wikis/uploads/2f376b7f179247ee3e0079d3afb4c782/Screenshot_2025-04-10_at_17.05.45.png)
+[![Architecture Diagram](https://git.chalmers.se/courses/dit113/2025/group-12/plant-monitoring-system/-/wikis/uploads/ca0ba6e6c76ceaca688827aadfa1e206/Screenshot_2025-05-22_at_12.11.59.png)
 
 ---
 
