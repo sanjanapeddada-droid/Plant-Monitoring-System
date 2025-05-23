@@ -2,12 +2,12 @@
 
 ##  Purpose and Benefits
 
-This project aims to monitor indoor plant conditions using smart sensors. The system continuously tracks temperature, light levels, soil moisture, water levels, and humidity to help plant owners take better care of their plants.
+This project aims to monitor plant conditions using smart sensors. The system continuously tracks temperature, light levels, soil moisture, water levels, and humidity to help plant owners take better care of their plants.
 
 ###  Benefits:
 - Prevents over or under watering
 - Warns if the light exposure is too high or too low
-- Real time environmental feedback (humidity, temperature, light, water)
+- Monitors and displays real time data recieved from the sensors. (humidity, temperature, light, water and moisture)
 - Easy to use GUI with historical data
 
 ---
@@ -21,7 +21,7 @@ This project aims to monitor indoor plant conditions using smart sensors. The sy
   - DHT11 for temperature and humidity
   - Soil moisture sensor
   - Light sensor
-  - Water presence sensor
+  - Water sensor
 
 ### Software
 - **Arduino (C++)** on Wio Terminal
@@ -82,14 +82,16 @@ This project aims to monitor indoor plant conditions using smart sensors. The sy
 
 ### Node modules
 1. cd into project root.
-2. type: npm install socket.io
+2. type: npm i
+
 3. cd into the data folder. 
-4. type: npm install socket.io
+4. type: npm i
 5. type: npm install socket.io-client
-6. cd into backend folder. 
-7. type: npm install socket.io
-8. cd into dataComparison
-9. type: npm install socket.io  
+6. type: npm install pinia
+
+7. cd into backend folder.
+8. type: npm i 
+9. type: npm install socket.io
 
 ---
 
@@ -115,21 +117,24 @@ This project aims to monitor indoor plant conditions using smart sensors. The sy
 ---
 
 ###  Vue Frontend
-1. Navigate to the "Data/" folder
-2. Run:
+1. Navigate to the data folder through terminal.
+2. Make sure to have the necessary node modules installed.
+3. Run:
     ```bash
-    npm install
     npm run dev
     ```
-3. The Vue app will connect to MQTT over WebSocket
+4. The Vue app will connect to MQTT over WebSocket
 
 ---
 
 ### Server 
-1. Open a terminal 
-2. cd into the backend folder 
-3. type node server.js 
-if everything is set up correctly you will see a messege similar to:
+1. Navigate to the backend folder through terminal.
+2. Make sure to have the necessary node modules installed.
+3. Run:
+    ```
+    node server.js
+    ```
+If everything is set up correctly you will see a message similar to:
 
 
 ![alt text](image.png)
@@ -140,10 +145,9 @@ if everything is set up correctly you will see a messege similar to:
 
 ![alt text](image-3.png)
 
-folders:
-- backend: code that connects MQTT and database with the rest of the code
-- data: code for the frontend part of our system 
-- dataComparsion: code for comparing the incoming sensor data to the set thresholds. 
+Folders:
+- backend: code that connects MQTT and the database with the frontend
+- data: code for the frontend part of our system (Vue)
 
 ##  Team Contributions
 
@@ -151,7 +155,7 @@ folders:
 |-----------|--------------|
 | **Tilly**     | Arduino programming, sensor integration, documentation |
 | **Artemis**   | MQTT setup, CI/CD pipeline, Arduino programming |
-| **Sanjana**   | Frontend development with Vue.js |
+| **Sanjana**   | Frontend development with Vue.js, data storage logic |
 | **Tyra**      | MySQL integration, data storage logic, frontend development focused on integration with the database|
 | **Giovanna**  | Project coordination, development with Vue.js, video editing |
 
