@@ -133,11 +133,13 @@ This project aims to monitor plant conditions using smart sensors. The system co
     ```
 
 
-### Repository structure 
+---
 
-Folders:
-- backend: code that connects MQTT and the database with the frontend
-- data: code for the frontend part of our system (Vue)
+## CI/CD
+- Originally used **GitLab CI** for automated testing and deployment during the course.  
+- `.gitlab-ci.yml` is included for reference but **not active on GitHub**.
+
+---
 
 ### My Contributions
 
@@ -151,4 +153,7 @@ Folders:
 [Demo for plant monitoring system](https://youtu.be/WSujGwdSVv8)
 
 ---
+## Academic Context
+This project was developed as part of a university course at the University of Gothenburg.  
+It is intended for **educational and portfolio purposes**.
 
