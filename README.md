@@ -30,9 +30,6 @@ This project aims to monitor plant conditions using smart sensors. The system co
 - **MySQL** (stores sensor history)
 - **CI/CD pipeline** via GitLab for Arduino builds
 
->  *Architecture Diagram:*  
-[![Architecture Diagram](https://git.chalmers.se/courses/dit113/2025/group-12/plant-monitoring-system/-/wikis/uploads/ca0ba6e6c76ceaca688827aadfa1e206/Screenshot_2025-05-22_at_12.11.59.png)
-
 ---
 
 ##  How to Set Up and Run
@@ -134,36 +131,24 @@ This project aims to monitor plant conditions using smart sensors. The system co
     ```
     node server.js
     ```
-If everything is set up correctly you will see a message similar to:
-
-
-![alt text](image.png)
-
 
 
 ### Repository structure 
-
-![alt text](image-5.png)
 
 Folders:
 - backend: code that connects MQTT and the database with the frontend
 - data: code for the frontend part of our system (Vue)
 
-##  Team Contributions
+### My Contributions
 
-| Name      | Contribution |
-|-----------|--------------|
-| **Tilly**     | Arduino programming, sensor integration, documentation |
-| **Artemis**   | MQTT setup, CI/CD pipeline, Arduino programming |
-| **Sanjana**   | Frontend development with Vue.js, data storage logic |
-| **Tyra**      | MySQL integration, data storage logic, frontend development focused on integration with the database|
-| **Giovanna**  | Project coordination, development with Vue.js, video editing |
+- Developed the **backend** logic to store incoming plant sensor data from **MQTT** into the database.
+- Implemented **threshold comparison** logic to monitor sensor values (temperature, humidity, light, soil moisture, water) and trigger alerts when readings exceed safe limits.
+- Built the **frontend** dashboard using **Vue.js** to display real-time sensor readings and alerts in an easy-to-understand format.
+- Connected the **frontend and backend** via **MQTT** over **WebSockets** to ensure live updates of plant data.
 
 ##  Link to demo:
 
-
 [Demo for plant monitoring system](https://youtu.be/WSujGwdSVv8)
-
 
 ---
 
